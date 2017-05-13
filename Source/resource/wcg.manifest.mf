@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Class-Path: lib/bcprov-jdk15on-156.jar lib/core-3.3.0.jar lib/h2-1.4.1
+ 93.jar lib/javase-3.3.0.jar lib/javax.servlet-api-3.1.0.jar lib/jetty
+ -client-9.3.15.v20161220.jar lib/jetty-continuation-9.3.15.v20161220.
+ jar lib/jetty-http-9.3.15.v20161220.jar lib/jetty-io-9.3.15.v20161220
+ .jar lib/jetty-proxy-9.3.15.v20161220.jar lib/jetty-security-9.3.15.v
+ 20161220.jar lib/jetty-server-9.3.15.v20161220.jar lib/jetty-servlet-
+ 9.3.15.v20161220.jar lib/jetty-servlets-9.3.15.v20161220.jar lib/jett
+ y-util-9.3.15.v20161220.jar lib/json-simple-1.1.1.jar lib/lucene-anal
+ yzers-common-5.3.2.jar lib/lucene-core-5.3.2.jar lib/lucene-queries-5
+ .3.2.jar lib/lucene-queryparser-5.3.2.jar lib/slf4j-api-1.7.22.jar li
+ b/slf4j-jdk14-1.7.22.jar lib/tika-core-1.13.jar lib/tika-parsers-1.13
+ .jar lib/websocket-api-9.3.15.v20161220.jar lib/websocket-client-9.3.
+ 15.v20161220.jar lib/websocket-common-9.3.15.v20161220.jar lib/websoc
+ ket-server-9.3.15.v20161220.jar lib/websocket-servlet-9.3.15.v2016122
+ 0.jar lib/weupnp-0.1.4.jar conf/
+Main-Class: wcg.Wcg
+

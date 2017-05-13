@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk15on-156.jar"/>
+	<classpathentry kind="lib" path="lib/core-3.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/h2-1.4.193.jar"/>
+	<classpathentry kind="lib" path="lib/javase-3.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet-api-3.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-client-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-continuation-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-http-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-io-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-proxy-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-security-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-server-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-servlet-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-servlets-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/java-json.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-analyzers-common-5.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-5.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-queries-5.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-queryparser-5.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.22.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.7.22.jar"/>
+	<classpathentry kind="lib" path="lib/tika-core-1.13.jar"/>
+	<classpathentry kind="lib" path="lib/tika-parsers-1.13.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-api-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-client-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-common-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-server-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-servlet-9.3.15.v20161220.jar"/>
+	<classpathentry kind="lib" path="lib/weupnp-0.1.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>
