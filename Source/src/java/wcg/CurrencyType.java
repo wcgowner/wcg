@@ -260,7 +260,7 @@ public enum CurrencyType {
 
     private static void validate(Currency currency, int type, Transaction transaction) throws WcgException.ValidationException {
         if (transaction.getAmountNQT() != 0) {
-            throw new WcgException.NotValidException("Currency transaction WCG amount must be 0");
+            throw new WcgException.NotValidException("Currency transaction " + Constants.COIN_NAME + " amount must be 0");
         }
 
         final EnumSet<CurrencyType> validators = EnumSet.noneOf(CurrencyType.class);
@@ -302,7 +302,7 @@ public enum CurrencyType {
                 throw new WcgException.NotValidException("Invalid currency code: " + code + " code must be all upper case");
             }
         }
-        if (code.contains("WCG") || code.contains("NEXT") || "wcg".equals(normalizedName) || "next".equals(normalizedName)) {
+        if (code.contains("" + Constants.COIN_NAME + "") || code.contains("NEXT") || "wcg".equals(normalizedName) || "next".equals(normalizedName)) {
             throw new WcgException.NotValidException("Currency name already used");
         }
         Currency currency;

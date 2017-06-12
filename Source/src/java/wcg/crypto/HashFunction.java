@@ -43,7 +43,7 @@ public enum HashFunction {
         }
     },
     /**
-     * Use proprietary WCG implementation of Keccak with 25 rounds (code 25)
+     * Use proprietary NXT implementation of Keccak with 25 rounds (code 25)
      */
     Keccak25((byte)25) {
         public byte[] hash(byte[] input) {

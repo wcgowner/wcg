@@ -1016,7 +1016,7 @@ final class TransactionImpl implements Transaction {
             int blockchainHeight = Wcg.getBlockchain().getHeight();
             long minimumFeeNQT = getMinimumFeeNQT(blockchainHeight);
             if (feeNQT < minimumFeeNQT) {
-                throw new WcgException.NotCurrentlyValidException(String.format("Transaction fee %f WCG less than minimum fee %f WCG at height %d",
+            	throw new WcgException.NotCurrentlyValidException(String.format("Transaction fee %f " + Constants.COIN_NAME + " less than minimum fee %f " + Constants.COIN_NAME + " at height %d",
                         ((double) feeNQT) / Constants.ONE_WCG, ((double) minimumFeeNQT) / Constants.ONE_WCG, blockchainHeight));
             }
             if (blockchainHeight > Constants.FXT_BLOCK && ecBlockId != 0) {
@@ -1106,10 +1106,15 @@ final class TransactionImpl implements Transaction {
 //            }
             Fee fee = blockchainHeight >= appendage.getNextFeeHeight() ? appendage.getNextFee(this) : appendage.getBaselineFee(this);
             totalFee = Math.addExact(totalFee, fee.getFee(this, appendage));
+            
+        	//Logger.logInfoMessage(String.format("Appendage %s fee=%d " + Constants.COIN_NAME + "; minimumFee=%d " + Constants.COIN_NAME + " at height %d.",
+        	//		appendage.getAppendixName(), fee.getFee(this, appendage), ((long) totalFee), blockchainHeight));
         }
         if (referencedTransactionFullHash != null) {
             totalFee = Math.addExact(totalFee, Constants.ONE_WCG);
         }
+        //Logger.logInfoMessage(String.format("getMinimumFeeNQT=%d " + Constants.COIN_NAME + " at height %d.",
+    	//		((long) totalFee), blockchainHeight));
         return totalFee;
     }
 

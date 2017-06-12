@@ -22,6 +22,7 @@ import java.util.TimeZone;
 
 public final class Constants {
 
+	public static final String COIN_NAME = "WCG";
     public static final boolean isTestnet = Wcg.getBooleanProperty("wcg.isTestnet");
     public static final boolean isOffline = Wcg.getBooleanProperty("wcg.isOffline");
     public static final boolean isLightClient = Wcg.getBooleanProperty("wcg.isLightClient");

@@ -232,11 +232,13 @@ public final class API {
                 apiHandlers.addHandler(contextHandler);
             }
 
-            ServletHolder servletHolder = apiHandler.addServlet(APIServlet.class, "/wcg");
+            //ServletHolder servletHolder = apiHandler.addServlet(APIServlet.class, "/wcg");
+            ServletHolder servletHolder = apiHandler.addServlet(APIServlet.class, "/"+Constants.COIN_NAME.toLowerCase());
             servletHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(
                     null, Math.max(Wcg.getIntProperty("wcg.maxUploadFileSize"), Constants.MAX_TAGGED_DATA_DATA_LENGTH), -1L, 0));
 
-            servletHolder = apiHandler.addServlet(APIProxyServlet.class, "/wcg-proxy");
+            //servletHolder = apiHandler.addServlet(APIProxyServlet.class, "/wcg-proxy");
+            servletHolder = apiHandler.addServlet(APIProxyServlet.class, "/"+Constants.COIN_NAME.toLowerCase()+"-proxy");
             servletHolder.setInitParameters(Collections.singletonMap("idleTimeout",
                     "" + Math.max(apiServerIdleTimeout - APIProxyServlet.PROXY_IDLE_TIMEOUT_DELTA, 0)));
             servletHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(
@@ -245,7 +247,8 @@ public final class API {
 
             GzipHandler gzipHandler = new GzipHandler();
             if (!Wcg.getBooleanProperty("wcg.enableAPIServerGZIPFilter")) {
-                gzipHandler.setExcludedPaths("/wcg", "/wcg-proxy");
+            	//gzipHandler.setExcludedPaths("/wcg", "/wcg-proxy");
+                gzipHandler.setExcludedPaths("/"+Constants.COIN_NAME.toLowerCase(), "/"+Constants.COIN_NAME.toLowerCase()+"-proxy");
             }
             gzipHandler.setIncludedMethods("GET", "POST");
             gzipHandler.setMinGzipSize(wcg.peer.Peers.MIN_COMPRESS_SIZE);

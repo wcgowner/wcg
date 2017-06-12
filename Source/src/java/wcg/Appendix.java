@@ -1200,14 +1200,22 @@ public interface Appendix {
             long fee = 0;
             Phasing phasing = (Phasing)appendage;
             if (!phasing.params.getVoteWeighting().isBalanceIndependent()) {
-                fee += 20 * Constants.ONE_WCG;
+                //suse
+                fee += (20 * Constants.ONE_WCG) / Constants.REDUCTOR_FEE;
+                // fee += 20 * Constants.ONE_WCG;
             } else {
-                fee += Constants.ONE_WCG;
+                //suse
+                fee += Constants.ONE_WCG / Constants.REDUCTOR_FEE;
+                // fee += Constants.ONE_WCG;
             }
             if (phasing.hashedSecret.length > 0) {
-                fee += (1 + (phasing.hashedSecret.length - 1) / 32) * Constants.ONE_WCG;
+                //suse
+                fee += ((1 + (phasing.hashedSecret.length - 1) / 32) * Constants.ONE_WCG) / Constants.REDUCTOR_FEE;
+                // fee += (1 + (phasing.hashedSecret.length - 1) / 32) * Constants.ONE_WCG;
             }
-            fee += Constants.ONE_WCG * phasing.linkedFullHashes.length;
+            //suse
+            fee += (Constants.ONE_WCG * phasing.linkedFullHashes.length) / Constants.REDUCTOR_FEE;
+            // fee += Constants.ONE_WCG * phasing.linkedFullHashes.length;
             return fee;
         };
 

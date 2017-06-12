@@ -46,7 +46,8 @@ import java.util.TreeMap;
 
 public final class FxtDistribution implements Listener<Block> {
 
-    private static final String CURRENCY_NAME = Wcg.getStringProperty("wcg.currencyName");
+	//private static final String CURRENCY_NAME = Wcg.getStringProperty("wcg.currencyName");
+    private static final String CURRENCY_NAME = Constants.COIN_NAME;
     public static final int DISTRIBUTION_END = Constants.FXT_BLOCK;
     public static final int DISTRIBUTION_START = DISTRIBUTION_END - 90 * 1440; // run for 90 days
     public static final int DISTRIBUTION_FREQUENCY = 720; // run processing every 720 blocks
@@ -171,7 +172,7 @@ public final class FxtDistribution implements Listener<Block> {
                             long balance = rs.getLong("balance");
                             if (logAccountId != 0) {
                                 if (accountId == logAccountId) {
-                                    Logger.logMessage("WCG balance for " + logAccount + " at height " + height + ":\t" + balance);
+                                    Logger.logMessage("" + Constants.COIN_NAME + " balance for " + logAccount + " at height " + height + ":\t" + balance);
                                 }
                             }
                             BigInteger accountBalanceTotal = accountBalanceTotals.get(accountId);
@@ -207,7 +208,7 @@ public final class FxtDistribution implements Listener<Block> {
                 }
                 if (logAccountId != 0) {
                     if (accountId == logAccountId) {
-                        Logger.logMessage("Average WCG balance for " + logAccount + " as of height " + currentHeight + ":\t"
+                        Logger.logMessage("Average " + Constants.COIN_NAME + " balance for " + logAccount + " as of height " + currentHeight + ":\t"
                                 + balanceTotal.divide(BigInteger.valueOf((currentHeight - DISTRIBUTION_START) / DISTRIBUTION_STEP)).longValueExact());
                     }
                 }

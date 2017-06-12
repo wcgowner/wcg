@@ -18,9 +18,11 @@ package wcg.env;
 
 import java.nio.file.Paths;
 
+import wcg.Constants;
+
 public class WindowsUserDirProvider extends DesktopUserDirProvider {
 
-    private static final String WCG_USER_HOME = Paths.get(System.getProperty("user.home"), "AppData", "Roaming", "WCG").toString();
+    private static final String WCG_USER_HOME = Paths.get(System.getProperty("user.home"), "AppData", "Roaming", "" + Constants.COIN_NAME + "").toString();
 
     @Override
     public String getUserHomeDir() {

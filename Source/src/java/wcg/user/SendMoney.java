@@ -103,7 +103,7 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
 
             JSONObject response = new JSONObject();
             response.put("response", "notifyOfIncorrectTransaction");
-            response.put("message", "\"Fee\" must be at least 1 WCG!");
+            response.put("message", "\"Fee\" must be at least 1 " + Constants.COIN_NAME + "!");
             response.put("recipient", recipientValue);
             response.put("amountWCG", amountValue);
             response.put("feeWCG", feeValue);

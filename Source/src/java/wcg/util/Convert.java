@@ -48,7 +48,8 @@ public final class Convert {
     public static final byte[][] EMPTY_BYTES = new byte[0][];
     public static final String[] EMPTY_STRING = new String[0];
 
-    private static final String CURRENCY_NAME = Wcg.getStringProperty("wcg.currencyName");
+  //private static final String CURRENCY_NAME = Wcg.getStringProperty("wcg.currencyName");
+    private static final String CURRENCY_NAME = Constants.COIN_NAME;
 
     private Convert() {} //never
 

@@ -71,7 +71,7 @@ var NRS = (function (NRS, $) {
         'NOT_FORGING': 'not_forging',
         'UNKNOWN': 'unknown',
         //suse 'LAST_KNOWN_BLOCK': { id: "14216614632643561569", height: "12888" },
-        'LAST_KNOWN_BLOCK': { id: "429943628837330866", height: "0" },
+        'LAST_KNOWN_BLOCK': { id: "2798206195875472141", height: "0" },
         'LAST_KNOWN_TESTNET_BLOCK': { id: "10261376443915405620", height: "1051000" }
     };
 

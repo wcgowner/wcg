@@ -719,13 +719,13 @@ public final class Shuffling {
                 Account previousGeneratorAccount = Account.getAccount(BlockDb.findBlockAtHeight(block.getHeight() - i - 1).getGeneratorId());
                 previousGeneratorAccount.addToBalanceAndUnconfirmedBalanceNQT(AccountLedger.LedgerEvent.BLOCK_GENERATED, block.getId(), fee);
                 previousGeneratorAccount.addToForgedBalanceNQT(fee);
-                Logger.logDebugMessage("Shuffling penalty %f WCG awarded to forger at height %d", ((double)fee) / Constants.ONE_WCG, block.getHeight() - i - 1);
+                Logger.logDebugMessage("Shuffling penalty %f " + Constants.COIN_NAME + " awarded to forger at height %d", ((double)fee) / Constants.ONE_WCG, block.getHeight() - i - 1);
             }
             fee = Constants.SHUFFLING_DEPOSIT_NQT - 3 * fee;
             Account blockGeneratorAccount = Account.getAccount(block.getGeneratorId());
             blockGeneratorAccount.addToBalanceAndUnconfirmedBalanceNQT(AccountLedger.LedgerEvent.BLOCK_GENERATED, block.getId(), fee);
             blockGeneratorAccount.addToForgedBalanceNQT(fee);
-            Logger.logDebugMessage("Shuffling penalty %f WCG awarded to forger at height %d", ((double)fee) / Constants.ONE_WCG, block.getHeight());
+            Logger.logDebugMessage("Shuffling penalty %f " + Constants.COIN_NAME + " awarded to forger at height %d", ((double)fee) / Constants.ONE_WCG, block.getHeight());
         }
         setStage(Stage.CANCELLED, blamedAccountId, (short)0);
         shufflingTable.insert(this);

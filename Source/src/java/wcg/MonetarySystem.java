@@ -242,7 +242,7 @@ public abstract class MonetarySystem extends TransactionType {
         void validateAttachment(Transaction transaction) throws WcgException.ValidationException {
             Attachment.MonetarySystemReserveIncrease attachment = (Attachment.MonetarySystemReserveIncrease) transaction.getAttachment();
             if (attachment.getAmountPerUnitNQT() <= 0) {
-                throw new WcgException.NotValidException("Reserve increase WCG amount must be positive: " + attachment.getAmountPerUnitNQT());
+                throw new WcgException.NotValidException("Reserve increase " + Constants.COIN_NAME + " amount must be positive: " + attachment.getAmountPerUnitNQT());
             }
             CurrencyType.validate(Currency.getCurrency(attachment.getCurrencyId()), transaction);
         }

@@ -16,6 +16,7 @@
 
 package wcg.env.service;
 
+import wcg.Constants;
 import wcg.Wcg;
 import wcg.env.LookAndFeel;
 
@@ -36,8 +37,8 @@ public class WcgService_ServiceManagement {
     // Invoked when registering the service
     public static String[] serviceGetInfo() {
         return new String[]{
-                "WCG Server", // Long name
-                "Manages the WCG cryptographic currency protocol", // Description
+                Constants.COIN_NAME + " Server", // Long name
+                "Manages the " + Constants.COIN_NAME + " cryptographic currency protocol", // Description
                 "true", // IsAutomatic
                 "true", // IsAcceptStop
                 "", // failure exe
@@ -52,7 +53,7 @@ public class WcgService_ServiceManagement {
     }
 
     public static boolean serviceIsCreate() {
-        return JOptionPane.showConfirmDialog(null, "Do you want to install the WCG service ?", "Create Service", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+        return JOptionPane.showConfirmDialog(null, "Do you want to install the " + Constants.COIN_NAME + " service ?", "Create Service", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
     public static boolean serviceIsLaunch() {
@@ -60,7 +61,7 @@ public class WcgService_ServiceManagement {
     }
 
     public static boolean serviceIsDelete() {
-        return JOptionPane.showConfirmDialog(null, "This WCG service is already installed. Do you want to delete it ?", "Delete Service", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+        return JOptionPane.showConfirmDialog(null, "This " + Constants.COIN_NAME + " service is already installed. Do you want to delete it ?", "Delete Service", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
     public static boolean serviceControl_Pause() {

@@ -39,6 +39,7 @@ public interface Fee {
 
         @Override
         public long getFee(TransactionImpl transaction, Appendix appendage) {
+        	//return fee/Constants.REDUCTOR_FEE < Constants.ONE_WCG/Constants.REDUCTOR_FEE ? Constants.ONE_WCG/Constants.REDUCTOR_FEE : fee/Constants.REDUCTOR_FEE;
             return fee/Constants.REDUCTOR_FEE;
         }
 
@@ -59,7 +60,8 @@ public interface Fee {
         }
 
         public SizeBasedFee(long constantFee, long feePerSize, int unitSize) {
-            this.constantFee = constantFee/Constants.REDUCTOR_FEE;
+        	this.constantFee = constantFee/Constants.REDUCTOR_FEE < Constants.ONE_WCG/Constants.REDUCTOR_FEE ? Constants.ONE_WCG/Constants.REDUCTOR_FEE : constantFee/Constants.REDUCTOR_FEE;
+            //this.constantFee = constantFee/Constants.REDUCTOR_FEE;
             this.feePerSize = feePerSize;
             this.unitSize = unitSize;
         }
@@ -71,7 +73,10 @@ public interface Fee {
             if (size < 0) {
                 return constantFee;
             }
-            return (Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize))/Constants.REDUCTOR_FEE);
+            long fee = (Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize))/Constants.REDUCTOR_FEE);
+            return fee < Constants.ONE_WCG/Constants.REDUCTOR_FEE ? Constants.ONE_WCG/Constants.REDUCTOR_FEE : fee;
+            //return fee;
+            //return (Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize))/Constants.REDUCTOR_FEE);
             //return (Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize))/Wcg.getIntProperty("wcg.reductorFee", 1));
             //return Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize));
         }

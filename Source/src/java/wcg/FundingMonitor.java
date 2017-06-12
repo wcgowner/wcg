@@ -619,7 +619,7 @@ public final class FundingMonitor {
             } else {
                 Wcg.getTransactionProcessor().broadcast(transaction);
                 monitoredAccount.height = Wcg.getBlockchain().getHeight();
-                Logger.logDebugMessage(String.format("WCG funding transaction %s for %f WCG submitted from %s to %s",
+                Logger.logDebugMessage(String.format("" + Constants.COIN_NAME + " funding transaction %s for %f " + Constants.COIN_NAME + " submitted from %s to %s",
                         transaction.getStringId(), (double)monitoredAccount.amount / Constants.ONE_WCG,
                         monitor.accountName, monitoredAccount.accountName));
             }

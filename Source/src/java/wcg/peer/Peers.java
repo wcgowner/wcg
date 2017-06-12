@@ -149,7 +149,7 @@ public final class Peers {
 
     static {
 
-        String platform = Wcg.getStringProperty("wcg.myPlatform", System.getProperty("os.name") + " " + System.getProperty("os.arch"));
+    	String platform = Wcg.getStringProperty(Constants.COIN_NAME + "wcg.myPlatform", System.getProperty("os.name") + " " + System.getProperty("os.arch"));
         if (platform.length() > MAX_PLATFORM_LENGTH) {
             platform = platform.substring(0, MAX_PLATFORM_LENGTH);
         }

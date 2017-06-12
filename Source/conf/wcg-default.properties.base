@@ -72,10 +72,10 @@ wcg.defaultPeers=
 
 # A list of well known peer addresses / host names, separated by '; '. These
 # peers are always kept in connected state.
-wcg.wellKnownPeers=
+wcg.wellKnownPeers=de.wcgacc.com; us.wcgacc.com; uk.wcgacc.com; sg.wcgacc.com; jp.wcgacc.com;
 
 # Known bad peers to be blacklisted.
-wcg.knownBlacklistedPeers=
+wcg.knownBlacklistedPeers=172.104.86.9; 172.104.60.30; 172.104.146.203; 178.79.130.64; 45.56.116.43; 139.162.47.229; 139.162.106.228; 139.162.180.60; 178.79.132.8; 45.79.66.180;
 
 # Default initial peers used for testnet only. Only used if wcg.usePeersDb=true.
 # Do not modify. Add custom testnet peers to wcg.testnetPeers instead.
