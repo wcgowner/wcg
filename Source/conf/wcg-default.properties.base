@@ -37,7 +37,7 @@
 wcg.shareMyAddress=true
 
 # Port for incoming peer to peer networking requests, if enabled.
-wcg.peerServerPort=
+wcg.peerServerPort=2052
 
 # Enable UPnP for the peer port.
 wcg.enablePeerUPnP=true
@@ -187,11 +187,11 @@ wcg.enableAPIServer=true
 wcg.allowedBotHosts=*;
 
 # Port for http/json API requests.
-wcg.apiServerPort=
+wcg.apiServerPort=2082
 
 # Port for https/json API request. If same as wcg.apiServerPort, the wcg.apiSSL
 # setting determines whether SSL is used or not.
-wcg.apiServerSSLPort=
+wcg.apiServerSSLPort=2082
 
 # Enable UPnP for the API ports.
 wcg.enableAPIUPnP=false
@@ -318,7 +318,7 @@ wcg.enableUIServer=false
 wcg.allowedUserHosts=127.0.0.1; localhost; [0:0:0:0:0:0:0:1];
 
 # Port for NRS user interface server.
-wcg.uiServerPort=
+wcg.uiServerPort=2086
 
 # Host interface for NRS user interface server, default localhost only.
 # Set to 0.0.0.0 to allow the UI to be accessed on all network interfaces.

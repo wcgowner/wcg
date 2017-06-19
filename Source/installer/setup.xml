@@ -59,7 +59,7 @@
     </locale>
 
     <resources>
-        <res id="InfoPanel.info" src="changelogs/wcg-client-@{runtime.wcg.version}.changelog.txt" parse="yes"/>
+        <res id="InfoPanel.info" src="changelogs/wcg-client-1.11.2.changelog.txt" parse="yes"/>
         <res id="LicencePanel.licence" src="LICENSE.txt"/>
         <res id="Installer.image" src="html/www/img/installer_left_pane.png"/>
         <res id="shortcutSpec.xml" src="../installer/shortcutSpec.xml"/>

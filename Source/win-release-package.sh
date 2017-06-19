@@ -56,7 +56,9 @@ done
 for f in `find wcg/html -name *.html -o -name *.js -o -name *.css -o -name *.json  -o -name *.ttf -o -name *.svg -o -name *.otf`
 do
 	gzip -9c "$f" > "$f".gz
+	chmod 777 "$f".gz
 done
+
 cd wcg
 echo generate jar files
 ../jar.sh
