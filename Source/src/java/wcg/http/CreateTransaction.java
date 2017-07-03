@@ -232,6 +232,8 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
                 builder.ecBlockHeight(ecBlockHeight);
             }
             Transaction transaction = builder.build(secretPhrase);
+
+            //Logger.logMessage("-------------->>>>>>>>>>>>>>>>> transaction.getFeeNQT()="+transaction.getFeeNQT());
             try {
                 if (Math.addExact(amountNQT, transaction.getFeeNQT()) > senderAccount.getUnconfirmedBalanceNQT()) {
                     return NOT_ENOUGH_FUNDS;

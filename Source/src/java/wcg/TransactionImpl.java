@@ -312,9 +312,12 @@ final class TransactionImpl implements Transaction {
             int effectiveHeight = (height < Integer.MAX_VALUE ? height : Wcg.getBlockchain().getHeight());
             long minFee = getMinimumFeeNQT(effectiveHeight);
             feeNQT = Math.max(minFee, builder.feeNQT);
+            //Logger.logMessage("1 -------------->>>>>>>>>>>>>>>>>feeNQT="+feeNQT);
         } else {
             feeNQT = builder.feeNQT;
+            //Logger.logMessage("2 -------------->>>>>>>>>>>>>>>>>feeNQT="+feeNQT);
         }
+        //Logger.logMessage("3 -------------->>>>>>>>>>>>>>>>>feeNQT="+feeNQT);
 
         if (builder.signature != null && secretPhrase != null) {
             throw new WcgException.NotValidException("Transaction is already signed");
@@ -1107,14 +1110,13 @@ final class TransactionImpl implements Transaction {
             Fee fee = blockchainHeight >= appendage.getNextFeeHeight() ? appendage.getNextFee(this) : appendage.getBaselineFee(this);
             totalFee = Math.addExact(totalFee, fee.getFee(this, appendage));
             
-        	//Logger.logInfoMessage(String.format("Appendage %s fee=%d " + Constants.COIN_NAME + "; minimumFee=%d " + Constants.COIN_NAME + " at height %d.",
-        	//		appendage.getAppendixName(), fee.getFee(this, appendage), ((long) totalFee), blockchainHeight));
+        	//Logger.logInfoMessage(String.format("1 Appendage %s fee=%d " + Constants.COIN_NAME + "; totalFee=%d " + Constants.COIN_NAME + " at height %d.", appendage.getAppendixName(), fee.getFee(this, appendage), ((long) totalFee), blockchainHeight));
         }
+        //Logger.logInfoMessage(String.format("2 totalFee=%d " + Constants.COIN_NAME + " at height %d.", ((long) totalFee), blockchainHeight));
         if (referencedTransactionFullHash != null) {
             totalFee = Math.addExact(totalFee, Constants.ONE_WCG);
         }
-        //Logger.logInfoMessage(String.format("getMinimumFeeNQT=%d " + Constants.COIN_NAME + " at height %d.",
-    	//		((long) totalFee), blockchainHeight));
+        //Logger.logInfoMessage(String.format("3 totalFee=%d " + Constants.COIN_NAME + " at height %d.", ((long) totalFee), blockchainHeight));
         return totalFee;
     }
 

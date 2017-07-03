@@ -39,9 +39,8 @@ var NRS = (function(NRS, $, undefined) {
 
 	//suse 04/01/2017
 	NRS.apiEndpoint = "wcg";
-	//NRS.defaultServer = "139.162.47.229";
 	NRS.defaultServer = "localhost";
-	NRS.defaultApiPort = "27876";
+	NRS.defaultApiPort = "2082";
 	NRS.defaultIsSsl = false;
 	NRS.forceIsMobileDevice = false;
 	///suse
@@ -1079,12 +1078,16 @@ NRS.addPagination = function () {
             if (response.peers && response.peers.length) {
 				NRS.peerConnect = true;
 				connectedIndicator.addClass("connected");
-                connectedIndicator.find("span").html($.t("Connected")).attr("data-i18n", "connected");
+				//suse 23/06/2017
+				//connectedIndicator.find("span").html($.t("Connected")).attr("data-i18n", "connected");
+                connectedIndicator.find("span").attr("data-i18n", "connected");
 				connectedIndicator.show();
 			} else {
 				NRS.peerConnect = false;
 				connectedIndicator.removeClass("connected");
-				connectedIndicator.find("span").html($.t("Not Connected")).attr("data-i18n", "not_connected");
+				//suse 23/06/2017
+				//connectedIndicator.find("span").html($.t("Not Connected")).attr("data-i18n", "not_connected");
+				connectedIndicator.find("span").attr("data-i18n", "not_connected");
 				connectedIndicator.show();
 			}
 		});

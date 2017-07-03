@@ -1520,6 +1520,7 @@
   "registration_finish": "Register Until",
   "shuffling_registration_height_help": "Shuffling won't start unless the required number of participants register before this height.",
   "details": "Details",
+  "Details": "Details",
   "min_balance": "Minimum Balance",
   "min_balance_model": "Minimum Balance Model",
   "voting_model": "Voting Model",
@@ -1865,5 +1866,9 @@
   "connected": "Connected",
   "working_offline": "You are working offline",
   "offline_actions": "Offline Actions",
-  "success_clipboard_copy": "Copied to the clipboard successfully."
+  "success_clipboard_copy": "Copied to the clipboard successfully.",
+  "interest": "Interest",
+  "false": "False",
+  "true": "True",
+  "active_forgers": "Active forgers"
 }

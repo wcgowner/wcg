@@ -47,7 +47,11 @@ var NRS = (function(NRS) {
                 generators: generators,
                 timeFormatted: timeFormatted,
                 heightFormatted: heightFormatted,
-                activeCount: activeCount
+                activeCount: activeCount,
+                //suse 23/06/2017
+                last_block_time_text: $.t("last_block_time"),
+                height_text: $.t('height'),
+                active_forgers_text: $.t('active_forgers')
             });
             view.render({});
             return;
@@ -66,7 +70,11 @@ var NRS = (function(NRS) {
             timeFormatted: "<span>.</span><span>.</span><span>.</span></span>",
             heightFormatted: "<span>.</span><span>.</span><span>.</span></span>",
             activeCount: "<span>.</span><span>.</span><span>.</span></span>",
-            loadingDotsClass: "loading_dots"
+            loadingDotsClass: "loading_dots",
+            //suse 23/06/2017
+            last_block_time_text: $.t("last_block_time"),
+            height_text: $.t('height'),
+            active_forgers_text: $.t('active_forgers')
         });
         var params = {
             "limit": 10
@@ -97,7 +105,11 @@ var NRS = (function(NRS) {
                     timeFormatted: timeFormatted,
                     heightFormatted: heightFormatted,
                     activeCount: activeCount,
-                    loadingDotsClass: ""
+                    loadingDotsClass: "",
+                    //suse 23/06/2017
+                    last_block_time_text: $.t("last_block_time"),
+                    height_text: $.t('height'),
+                    active_forgers_text: $.t('active_forgers')
                 });
                 NRS.pageLoaded();
                 if (NRS.currentPage == "generators") {

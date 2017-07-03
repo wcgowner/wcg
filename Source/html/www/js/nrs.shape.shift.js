@@ -384,8 +384,24 @@ var NRS = (function(NRS, $) {
     function loadDepositCoins() {
     	if (depositButtonLoaded == 1) return;
     	var exchange_deposit_div_button = $("#exchange_deposit_div_button");
-    	var newButton = getDepositCoinButton();
-    	exchange_deposit_div_button.append(newButton.join(" "));
+    	//var newButton = getDepositCoinButton();
+        //suse dynamically create exchange deposit button based on existing asset in the blockchain
+        NRS.sendRequest("getAssetIds", {
+            "asset": 'all'
+        }, function (response) {
+            //console.log(response);
+            for (var foundAsset in response.assetIds) {
+                NRS.sendRequest("getAsset", {
+                    "asset": response.assetIds[foundAsset]
+                }, function (response) {
+                    //console.log(response.name);
+                    buttonTxt = $.t("exchange_deposit_button", { coin: response.name });
+                    newButton = '<a class="btn btn-default" href="#" id="exchange_deposit_'+response.name+'" data-toggle="modal" data-target="#deposit_coin_modal" coin-type="'+response.name+'">'+buttonTxt+'</a>&nbsp;';
+                    if (response.quantityQNT > 0) exchange_deposit_div_button.append(newButton);
+                });
+            }
+        });
+    	//exchange_deposit_div_button.append(newButton.join(" "));
         depositButtonLoaded = 1;
     }
     
@@ -406,7 +422,7 @@ var NRS = (function(NRS, $) {
 
     $("#deposit_coin_modal").on("show.bs.modal", function (e) {
         var invoker = $(e.relatedTarget);
-        var agentEmail= "wcg_agent@email.com";
+        var agentEmail= "acc@wcgacc.com";
         var coin = invoker.attr("coin-type");
         var title = invoker.text();
         $("#deposit_coin_modal_title").html(title);

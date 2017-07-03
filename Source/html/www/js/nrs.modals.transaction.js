@@ -303,10 +303,13 @@ var NRS = (function (NRS, $, undefined) {
                         if (transaction.attachment.messageHash && !NRS.isTextMessage(transaction) && transaction.block) {
                             downloadLink = "<tr><td>" + NRS.getMessageDownloadLink(transaction.transaction, sharedKey) + "</td></tr>";
                         }
+                        //suse 23/06/2017
+                        var isCompressedText = $.t(String(isCompressed));
                         $output.append("<table>" +
                             "<tr><td><strong>" + $.t("from") + "</strong>:&nbsp;</td><td>" + NRS.getAccountLink(transaction, "sender") + "</td></tr>" +
                             "<tr><td><strong>" + $.t("to") + "</strong>:&nbsp;</td><td>" + NRS.getAccountLink(transaction, "recipient") + "</td></tr>" +
-                            "<tr><td><strong>" + $.t("compressed") + "</strong>:&nbsp;</td><td>" + isCompressed + "</td></tr>" +
+                            //"<tr><td><strong>" + $.t("compressed") + "</strong>:&nbsp;</td><td>" + isCompressed + "</td></tr>" +
+                            "<tr><td><strong>" + $.t("compressed") + "</strong>:&nbsp;</td><td>" + isCompressedText + "</td></tr>" +
                             hashRow + downloadLink +
                         "</table>");
                         $output.show();
@@ -559,7 +562,9 @@ var NRS = (function (NRS, $, undefined) {
                                 data["quantity"] = [asset.quantityQNT, transaction.attachment.decimals];
                             }
                             data["sender"] = transaction.senderRS ? transaction.senderRS : transaction.sender;
-                            $("#transaction_info_callout").html("<a href='#' data-goto-asset='" + NRS.escapeRespStr(transaction.transaction) + "'>Click here</a> to view this asset in the Asset Exchange.").show();
+                            //suse 23/06/2017
+                            //$("#transaction_info_callout").html("<a href='#' data-goto-asset='" + NRS.escapeRespStr(transaction.transaction) + "'>Click here</a> to view this asset in the Asset Exchange.").show();
+                            $("#transaction_info_callout").html("<a href='#' data-goto-asset='" + NRS.escapeRespStr(transaction.transaction) + "'>"+$.t("click_here", "Click here")+"</a> "+$.t("view_asset_in_asset_exchange", "to view this asset in the Asset Exchange")+".").show();
 
                             infoTable.find("tbody").append(NRS.createInfoTable(data));
                             infoTable.show();

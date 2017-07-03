@@ -653,10 +653,13 @@ var NRS = (function (NRS, $, undefined) {
         var accountTitle;
         if (accountRef && accountRS == accountRef) {
             accountTitle = $.t(title);
+            //suse console.log('if (accountRef && accountRS == accountRef) { accountTitle='+accountTitle);
         } else if(showAccountRS) {
             accountTitle = String(accountRS).escapeHTML();
+            //suse console.log('} else if(showAccountRS) { accountTitle='+accountTitle);
         } else {
             accountTitle = NRS.getAccountTitle(object, accountKey);
+            //suse console.log('} else { accountTitle='+accountTitle);
         }
         if (!clazz) {
             clazz = "";
@@ -668,7 +671,7 @@ var NRS = (function (NRS, $, undefined) {
             }
         }
         return "<a href='#' data-user='" + String(accountRS).escapeHTML() +
-            "' class='show_account_modal_action user-info" + clazz + "'>" + accountTitle + "</a>";
+            "' class='show_account_modal_action user-info" + clazz + "' data-i18n='details'>" + accountTitle + "</a>";
     };
 
     NRS.getTransactionLink = function(id, text, isEscapedText) {
@@ -865,7 +868,10 @@ var NRS = (function (NRS, $, undefined) {
                 value = NRS.escapeRespStr(value).nl2br();
             }
 
-            rows += "<tr><td style='font-weight:bold" + (fixed ? ";width:150px" : "") + "'>" + $.t(key).escapeHTML() + (type ? " " + type.escapeHTML() : "") + ":</td><td style='width:90%;word-break:break-all'>" + value + "</td></tr>";
+            //suse 23/06/2017
+            //rows += "<tr><td style='font-weight:bold" + (fixed ? ";width:150px" : "") + "'>" + $.t(key).escapeHTML() + (type ? " " + type.escapeHTML() : "") + ":</td><td style='width:90%;word-break:break-all'>" + value + "</td></tr>";
+            if (value == 'true' || value == 'false') rows += "<tr><td style='font-weight:bold" + (fixed ? ";width:150px" : "") + "'>" + $.t(key).escapeHTML() + (type ? " " + type.escapeHTML() : "") + ":</td><td style='width:90%;word-break:break-all'>" +  $.t(value) + "</td></tr>";
+            else rows += "<tr><td style='font-weight:bold" + (fixed ? ";width:150px" : "") + "'>" + $.t(key).escapeHTML() + (type ? " " + type.escapeHTML() : "") + ":</td><td style='width:90%;word-break:break-all'>" + value + "</td></tr>";
         }
 
         return rows;

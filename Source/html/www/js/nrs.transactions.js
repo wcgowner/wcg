@@ -324,9 +324,13 @@ var NRS = (function(NRS, $, undefined) {
 						var progressBarWidth = Math.round(percentageProgressBar / 2);
                         var approvedFormatted;
 						if (responsePoll.approved || attachment.phasingQuorum == 0) {
-							approvedFormatted = "Yes";
+							//suse 23/06/2017
+							//approvedFormatted = "Yes";
+							approvedFormatted = $.t('yes', 'Yes');
 						} else {
-							approvedFormatted = "No";
+							//suse 23/06/2017
+							//approvedFormatted = "No";
+							approvedFormatted = $.t('no', 'No');
 						}
 
 						if (finished) {
@@ -568,8 +572,11 @@ var NRS = (function(NRS, $, undefined) {
 		html += '</td>';
         html += "<td style='vertical-align:middle;text-align:right;" + amountColor + "'>" + formattedAmount + "</td>";
         html += "<td style='vertical-align:middle;text-align:right;" + feeColor + "'>" + formattedFee + "</td>";
-		html += "<td style='vertical-align:middle;'>" + ((NRS.getAccountLink(t, "sender") == "/" && t.type == 2) ? "Asset Exchange" : NRS.getAccountLink(t, "sender")) + " ";
-		html += "<i class='fa fa-arrow-circle-right' style='color:#777;'></i> " + ((NRS.getAccountLink(t, "recipient") == "/" && t.type == 2) ? "Asset Exchange" : NRS.getAccountLink(t, "recipient")) + "</td>";
+        //suse 23/06/2017
+		//html += "<td style='vertical-align:middle;'>" + ((NRS.getAccountLink(t, "sender") == "/" && t.type == 2) ? "Asset Exchange" : NRS.getAccountLink(t, "sender")) + " ";
+		//html += "<i class='fa fa-arrow-circle-right' style='color:#777;'></i> " + ((NRS.getAccountLink(t, "recipient") == "/" && t.type == 2) ? "Asset Exchange" : NRS.getAccountLink(t, "recipient")) + "</td>";
+		html += "<td style='vertical-align:middle;'>" + ((NRS.getAccountLink(t, "sender") == "/" && t.type == 2) ? $.t("asset_exchange", "Asset Exchange") : NRS.getAccountLink(t, "sender")) + " ";
+		html += "<i class='fa fa-arrow-circle-right' style='color:#777;'></i> " + ((NRS.getAccountLink(t, "recipient") == "/" && t.type == 2) ? $.t("asset_exchange", "Asset Exchange") : NRS.getAccountLink(t, "recipient")) + "</td>";
 		html += "<td class='td_transaction_phasing' style='min-width:100px;vertical-align:middle;text-align:center;'></td>";
 		html += "<td style='vertical-align:middle;text-align:center;'>" + (t.confirmed ? NRS.getBlockLink(t.height, null, true) : "-") + "</td>";
 		html += "<td class='confirmations' style='vertical-align:middle;text-align:center;font-size:12px;'>";

@@ -398,7 +398,6 @@
 	    }
 
 	    this.addNamespaces(ns);
-
 	    setPath(this.data, path, value);
 
 	    if (!options.silent) this.emit('added', lng, ns, key, value);
@@ -684,6 +683,7 @@
 	    if (typeof keys === 'string') keys = [keys];
 
 	    // return key on CIMode
+
 	    var lng = options.lng || this.language;
 	    if (lng && lng.toLowerCase() === 'cimode') return keys[keys.length - 1];
 
