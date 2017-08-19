@@ -271,7 +271,7 @@ final class TransactionImpl implements Transaction {
         this.senderId = builder.senderId;
         this.blockTimestamp = builder.blockTimestamp;
         this.fullHash = builder.fullHash;
-		this.ecBlockHeight = builder.ecBlockHeight;
+        this.ecBlockHeight = builder.ecBlockHeight;
         this.ecBlockId = builder.ecBlockId;
 
         List<Appendix.AbstractAppendix> list = new ArrayList<>();
@@ -1019,7 +1019,7 @@ final class TransactionImpl implements Transaction {
             int blockchainHeight = Wcg.getBlockchain().getHeight();
             long minimumFeeNQT = getMinimumFeeNQT(blockchainHeight);
             if (feeNQT < minimumFeeNQT) {
-            	throw new WcgException.NotCurrentlyValidException(String.format("Transaction fee %f " + Constants.COIN_NAME + " less than minimum fee %f " + Constants.COIN_NAME + " at height %d",
+                throw new WcgException.NotCurrentlyValidException(String.format("Transaction fee %f " + Constants.COIN_NAME + " less than minimum fee %f " + Constants.COIN_NAME + " at height %d",
                         ((double) feeNQT) / Constants.ONE_WCG, ((double) minimumFeeNQT) / Constants.ONE_WCG, blockchainHeight));
             }
             if (blockchainHeight > Constants.FXT_BLOCK && ecBlockId != 0) {
@@ -1100,23 +1100,18 @@ final class TransactionImpl implements Transaction {
         return type.isUnconfirmedDuplicate(this, duplicates);
     }
 
-    private long getMinimumFeeNQT(int blockchainHeight) {
+    public long getMinimumFeeNQT(int blockchainHeight) {
         long totalFee = 0;
+
         for (Appendix.AbstractAppendix appendage : appendages) {
             appendage.loadPrunable(this);
-//            if (blockchainHeight < appendage.getBaselineFeeHeight()) {
-//                return 0; // No need to validate fees before baseline block
-//            }
             Fee fee = blockchainHeight >= appendage.getNextFeeHeight() ? appendage.getNextFee(this) : appendage.getBaselineFee(this);
             totalFee = Math.addExact(totalFee, fee.getFee(this, appendage));
-            
-        	//Logger.logInfoMessage(String.format("1 Appendage %s fee=%d " + Constants.COIN_NAME + "; totalFee=%d " + Constants.COIN_NAME + " at height %d.", appendage.getAppendixName(), fee.getFee(this, appendage), ((long) totalFee), blockchainHeight));
         }
-        //Logger.logInfoMessage(String.format("2 totalFee=%d " + Constants.COIN_NAME + " at height %d.", ((long) totalFee), blockchainHeight));
         if (referencedTransactionFullHash != null) {
             totalFee = Math.addExact(totalFee, Constants.ONE_WCG);
         }
-        //Logger.logInfoMessage(String.format("3 totalFee=%d " + Constants.COIN_NAME + " at height %d.", ((long) totalFee), blockchainHeight));
+
         return totalFee;
     }
 
