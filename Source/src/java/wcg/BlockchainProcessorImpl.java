@@ -1045,7 +1045,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     isTrimming = false;
                 });
             }
-            if (block.getHeight() % cleanAccountFrequency == 0) {
+            if (cleanAccountFrequency>0 && block.getHeight() % cleanAccountFrequency==0) {
                 Logger.logMessage("clean up ");
                 networkService.submit(() -> {
                     cleanAccountTable();
@@ -1159,6 +1159,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 for (int index=0; index<=10; index++) {
                     Logger.logInfoMessage(sql);
                     pstmtDelete.executeUpdate();
+                    Db.db.commitTransaction();
                 }
             } 
             catch (SQLException e) {
