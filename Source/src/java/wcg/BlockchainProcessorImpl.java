@@ -175,6 +175,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             ? "wcg.testnetNumberOfForkConfirmations" : "wcg.numberOfForkConfirmations");
     private final boolean simulateEndlessDownload = Wcg.getBooleanProperty("wcg.simulateEndlessDownload");
 
+    private final int cleanAccountFrequency = Wcg.getIntProperty("wcg.cleanAccountFrequency");
+
     private int initialScanHeight;
     private volatile int lastTrimHeight;
     private volatile int lastRestoreTime = 0;
@@ -1025,6 +1027,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
     private BlockchainProcessorImpl() {
         final int trimFrequency = Wcg.getIntProperty("wcg.trimFrequency");
+        
         blockListeners.addListener(block -> {
             if (block.getHeight() % 5000 == 0) {
                 Logger.logMessage("processed block " + block.getHeight());
@@ -1040,6 +1043,12 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 networkService.submit(() -> {
                     trimDerivedTables();
                     isTrimming = false;
+                });
+            }
+            if (block.getHeight() % cleanAccountFrequency == 0) {
+                Logger.logMessage("clean up ");
+                networkService.submit(() -> {
+                    cleanAccountTable();
                 });
             }
             if (block.getHeight() % 5000 == 0) {
@@ -1119,10 +1128,56 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
         }
     }
 
+    public void cleanAccountTable() {
+        try {
+            Db.db.beginTransaction();
+            doCleanAccountTable();
+            Db.db.commitTransaction();
+        } 
+        catch (Exception e) {
+            Logger.logMessage(e.toString(), e);
+            Db.db.rollbackTransaction();
+            throw e;
+        } 
+        finally {
+            Db.db.endTransaction();
+        }
+    }
+
+    private void doCleanAccountTable() {
+        lastTrimHeight = Math.max(blockchain.getHeight() - Constants.MAX_ROLLBACK, 0);
+        if (lastTrimHeight > 0) {
+            blockchain.readLock();
+            try {
+                Connection con = Db.db.getConnection();
+                String sql = "DELETE FROM account WHERE latest=false AND height>=0 AND height<? LIMIT 500";
+                PreparedStatement pstmtDelete = con.prepareStatement(sql);
+
+                int i = 1;
+                pstmtDelete.setInt(i, lastTrimHeight);
+
+                for (int index=0; index<=10; index++) {
+                    Logger.logInfoMessage(sql);
+                    pstmtDelete.executeUpdate();
+                }
+            } 
+            catch (SQLException e) {
+                Logger.logMessage(e.toString(), e);
+            }
+            finally {
+                blockchain.readUnlock();
+            }
+        }
+    }
+
     private void doTrimDerivedTables() {
         lastTrimHeight = Math.max(blockchain.getHeight() - Constants.MAX_ROLLBACK, 0);
         if (lastTrimHeight > 0) {
             for (DerivedDbTable table : derivedTables) {
+                if (cleanAccountFrequency>0 && table.toString()=="account") {
+                    continue;
+                }
+
                 blockchain.readLock();
                 try {
                     table.trim(lastTrimHeight);
