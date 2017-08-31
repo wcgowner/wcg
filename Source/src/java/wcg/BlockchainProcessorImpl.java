@@ -1150,13 +1150,13 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             blockchain.readLock();
             try {
                 Connection con = Db.db.getConnection();
-                String sql = "DELETE FROM account WHERE latest=false AND height>=0 AND height<? LIMIT 500";
+                String sql = "DELETE FROM account WHERE latest=false AND height>=0 AND height<? LIMIT 1000";
                 PreparedStatement pstmtDelete = con.prepareStatement(sql);
 
                 int i = 1;
                 pstmtDelete.setInt(i, lastTrimHeight);
 
-                for (int index=0; index<=10; index++) {
+                for (int index=0; index<20; index++) {
                     Logger.logInfoMessage(sql);
                     pstmtDelete.executeUpdate();
                     Db.db.commitTransaction();
