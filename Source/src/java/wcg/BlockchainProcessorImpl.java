@@ -176,6 +176,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     private final boolean simulateEndlessDownload = Wcg.getBooleanProperty("wcg.simulateEndlessDownload");
 
     private final int cleanAccountFrequency = Wcg.getIntProperty("wcg.cleanAccountFrequency");
+    private final int cleanAccountLimit = Wcg.getIntProperty("wcg.cleanAccountLimit", 1000);
+    private final int cleanAccountCycle = Wcg.getIntProperty("wcg.cleanAccountCycle", 10);
 
     private int initialScanHeight;
     private volatile int lastTrimHeight;
@@ -1150,13 +1152,13 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             blockchain.readLock();
             try {
                 Connection con = Db.db.getConnection();
-                String sql = "DELETE FROM account WHERE latest=false AND height>=0 AND height<? LIMIT 1000";
+                String sql = "DELETE FROM account WHERE latest=false AND height>=0 AND height<? LIMIT ?";
                 PreparedStatement pstmtDelete = con.prepareStatement(sql);
 
-                int i = 1;
-                pstmtDelete.setInt(i, lastTrimHeight);
+                pstmtDelete.setInt(1, lastTrimHeight);
+                pstmtDelete.setInt(2, cleanAccountLimit);
 
-                for (int index=0; index<20; index++) {
+                for (int index=0; index<cleanAccountCycle; index++) {
                     Logger.logInfoMessage(sql);
                     pstmtDelete.executeUpdate();
                     Db.db.commitTransaction();
