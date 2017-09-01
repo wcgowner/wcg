@@ -1047,10 +1047,12 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     isTrimming = false;
                 });
             }
-            if (cleanAccountFrequency>0 && block.getHeight() % cleanAccountFrequency==0) {
-                networkService.submit(() -> {
-                    cleanAccountTable();
-                });
+            if (cleanAccountFrequency>0) { 
+                if (block.getHeight() % cleanAccountFrequency==0) {
+                    networkService.submit(() -> {
+                        cleanAccountTable();
+                    });
+                }
             }
             if (block.getHeight() % 5000 == 0) {
                 Logger.logMessage("received block " + block.getHeight());
