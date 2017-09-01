@@ -1150,7 +1150,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
         if (lastTrimHeight > 0) {
             blockchain.readLock();
             try {
-                Logger.logMessage("clean up - begin : "+lastTrimHeight+" "+cleanAccountLimit+" "+cleanAccountCycle);
+                Logger.logDebugMessage("clean up - begin : "+lastTrimHeight+" "+cleanAccountLimit+" "+cleanAccountCycle);
                 Connection con = Db.db.getConnection();
                 String sql = "DELETE FROM account WHERE latest=false AND height>=0 AND height<? LIMIT ?";
                 PreparedStatement pstmtDelete = con.prepareStatement(sql);
@@ -1162,6 +1162,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     pstmtDelete.executeUpdate();
                     Db.db.commitTransaction();
                 }
+
+                Logger.logDebugMessage("clean up - end");
             } 
             catch (SQLException e) {
                 Logger.logMessage(e.toString(), e);
@@ -1182,7 +1184,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
                 blockchain.readLock();
                 try {
-                    Logger.logMessage("trimming "+table.toString());
+                    Logger.logDebugMessage("trimming "+table.toString());
                     table.trim(lastTrimHeight);
                     Db.db.commitTransaction();
                 } finally {
