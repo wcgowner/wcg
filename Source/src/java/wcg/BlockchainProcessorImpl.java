@@ -195,6 +195,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     private volatile boolean isProcessingBlock;
     private volatile boolean isRestoring;
     private volatile boolean alreadyInitialized = false;
+    private volatile boolean isCleaningAccount = false;
 
     private final Runnable getMoreBlocksThread = new Runnable() {
 
@@ -1048,9 +1049,11 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 });
             }
             if (cleanAccountFrequency>0) { 
-                if (block.getHeight() % cleanAccountFrequency==0) {
+                if (block.getHeight() % cleanAccountFrequency==0 && !isCleaningAccount) {
+                    isCleaningAccount = true;
                     networkService.submit(() -> {
                         cleanAccountTable();
+                        isCleaningAccount = false;
                     });
                 }
             }
