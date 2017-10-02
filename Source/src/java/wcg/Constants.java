@@ -55,7 +55,7 @@ public final class Constants {
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
     public static final int FORGING_DELAY = Wcg.getIntProperty("wcg.forgingDelay");
     public static final int FORGING_SPEEDUP = Wcg.getIntProperty("wcg.forgingSpeedup");
-    public static final int BATCH_COMMIT_SIZE = Wcg.getIntProperty("wcg.batchCommitSize", Integer.MAX_VALUE);
+    public static final int BATCH_COMMIT_SIZE = Wcg.getIntProperty("wcg.batchCommitSize", 100);
 
     public static final byte MAX_PHASING_VOTE_TRANSACTIONS = 10;
     public static final byte MAX_PHASING_WHITELIST_SIZE = 10;
