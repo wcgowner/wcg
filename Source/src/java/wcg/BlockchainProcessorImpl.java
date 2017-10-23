@@ -21,6 +21,7 @@ import wcg.db.DbIterator;
 import wcg.db.DerivedDbTable;
 import wcg.db.FilteringIterator;
 import wcg.db.FullTextTrigger;
+import wcg.interest.InterestManager;
 import wcg.peer.Peer;
 import wcg.peer.Peers;
 import wcg.util.Convert;
@@ -238,10 +239,10 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     networkService.submit(new RestorePrunableDataTask());
                 }
             } catch (InterruptedException e) {
-                Logger.logDebugMessage("Blockchain download thread interrupted");
+              Logger.logDebugMessage("Blockchain download thread interrupted");
             } catch (Throwable t) {
-                Logger.logErrorMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString(), t);
-                System.exit(1);
+              Logger.logErrorMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString(), t);
+              System.exit(1);
             }
         }
 
@@ -1882,6 +1883,9 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
         BlockImpl block = new BlockImpl(getBlockVersion(previousBlock.getHeight()), blockTimestamp, previousBlock.getId(), totalAmountNQT, totalFeeNQT, payloadLength,
                 payloadHash, publicKey, generationSignature, previousBlockHash, blockTransactions, secretPhrase);
 
+        // #leopard#
+        InterestManager.SetForgerSecretPhrase(secretPhrase);
+        
         try {
             pushBlock(block);
             blockListeners.notify(block, Event.BLOCK_GENERATED);

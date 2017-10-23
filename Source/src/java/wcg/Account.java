@@ -1821,6 +1821,31 @@ public final class Account {
         AssetDividend.addAssetDividend(transactionId, attachment, totalDividend, numAccounts);
     }
 
+    // #leopard# 
+    void payInterests(final long transactionId, Attachment.InterestPayment attachment) {
+        /*
+        long totalDividend = 0;
+        List<AccountAsset> accountAssets = new ArrayList<>();
+        try (DbIterator<AccountAsset> iterator = getAssetAccounts(attachment.getAssetId(), attachment.getHeight(), 0, -1)) {
+            while (iterator.hasNext()) {
+                accountAssets.add(iterator.next());
+            }
+        }
+        final long amountNQTPerQNT = attachment.getAmount();
+        long numAccounts = 0;
+        for (final AccountAsset accountAsset : accountAssets) {
+            if (accountAsset.getAccountId() != this.id && accountAsset.getQuantityQNT() != 0) {
+                long dividend = Math.multiplyExact(accountAsset.getQuantityQNT(), amountNQTPerQNT);
+                Account.getAccount(accountAsset.getAccountId()).addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.ASSET_DIVIDEND_PAYMENT, transactionId, dividend);
+                totalDividend += dividend;
+                numAccounts += 1;
+            }
+        }
+        this.addToBalanceNQT(LedgerEvent.INTEREST_PAYMENT, transactionId, -totalDividend);
+        Interest.addInterest(transactionId, attachment, totalDividend, numAccounts);
+        */
+    }
+     
     @Override
     public String toString() {
         return "Account " + Long.toUnsignedString(getId());

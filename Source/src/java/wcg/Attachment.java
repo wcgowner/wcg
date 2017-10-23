@@ -140,6 +140,16 @@ public interface Attachment extends Appendix {
 
     };
 
+    // #leopard#
+    EmptyAttachment INTEREST_PAYMENT = new EmptyAttachment() {
+
+        @Override
+        public TransactionType getTransactionType() {
+            return TransactionType.Interest.INTEREST_PAYMENT;
+        }
+
+    };
+    
     final class MessagingAliasAssignment extends AbstractAttachment {
 
         private final String aliasName;
@@ -3636,6 +3646,90 @@ public interface Attachment extends Appendix {
 
         public short getMaxDuration() {
             return maxDuration;
+        }
+
+    }
+    
+    final class InterestPayment extends AbstractAttachment {
+
+        private final int height;
+        private final int begin;
+        private final int end;
+        private final int numberAccounts;
+        private final long amount;
+
+        InterestPayment(ByteBuffer buffer, byte transactionVersion) {
+            super(buffer, transactionVersion);
+            this.height = buffer.getInt();
+            this.begin = buffer.getInt();
+            this.end = buffer.getInt();
+            this.numberAccounts = buffer.getInt();
+            this.amount = buffer.getLong();
+        }
+
+        InterestPayment(JSONObject attachmentData) {
+            super(attachmentData);
+            this.height = ((Long)attachmentData.get("height")).intValue();
+            this.begin = ((Long)attachmentData.get("begin")).intValue();
+            this.end = ((Long)attachmentData.get("end")).intValue();
+            this.numberAccounts = ((Long)attachmentData.get("numberAccounts")).intValue();
+            this.amount = Convert.parseLong(attachmentData.get("amount"));
+        }
+
+        public InterestPayment(int height, int begin, int end, int numberAccounts, long amount) {
+            this.height = height;
+            this.begin = begin;
+            this.end = end;
+            this.numberAccounts = numberAccounts;
+            this.amount = amount;
+        }
+
+        @Override
+        int getMySize() {
+            return 4 + 4 + 4 + 4 + 8;
+        }
+
+        @Override
+        void putMyBytes(ByteBuffer buffer) {
+            buffer.putInt(height);
+            buffer.putInt(begin);
+            buffer.putInt(end);
+            buffer.putInt(numberAccounts);
+            buffer.putLong(amount);
+        }
+
+        @Override
+        void putMyJSON(JSONObject attachment) {
+            attachment.put("height", height);
+            attachment.put("begin", begin);
+            attachment.put("end", end);
+            attachment.put("numberAccounts", numberAccounts);
+            attachment.put("amount", amount);
+        }
+
+        @Override
+        public TransactionType getTransactionType() {
+            return TransactionType.Interest.INTEREST_PAYMENT;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public int getBegin() {
+            return begin;
+        }
+        
+        public int getEnd() {
+            return end;
+        }
+        
+        public int getNumberAccounts() {
+            return numberAccounts;
+        }
+        
+        public long getAmount() {
+            return amount;
         }
 
     }

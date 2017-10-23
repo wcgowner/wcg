@@ -31,6 +31,7 @@ import wcg.util.Logger;
 import wcg.util.ThreadPool;
 import wcg.util.Time;
 import org.json.simple.JSONObject;
+import wcg.interest.InterestManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -243,6 +244,25 @@ public final class Wcg {
         }
         return result;
     }
+    
+    public static List<String> getStringListProperty(String name, String defaultValue) {
+        String value = getStringProperty(name);
+        if (value == null || value.length() == 0) {
+            if (defaultValue.isEmpty()) {
+              return Collections.emptyList();
+            }
+            
+            value = defaultValue;
+        }
+        List<String> result = new ArrayList<>();
+        for (String s : value.split(";")) {
+            s = s.trim();
+            if (s.length() > 0) {
+                result.add(s);
+            }
+        }
+        return result;
+    }
 
     public static Boolean getBooleanProperty(String name) {
         String value = properties.getProperty(name);
@@ -344,6 +364,7 @@ public final class Wcg {
                 setServerStatus(ServerStatus.AFTER_DATABASE, null);
                 TransactionProcessorImpl.getInstance();
                 BlockchainProcessorImpl.getInstance();
+                InterestManager.Init();
                 Account.init();
                 AccountRestrictions.init();
                 AccountLedger.init();

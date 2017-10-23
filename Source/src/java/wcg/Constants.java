@@ -22,9 +22,9 @@ import java.util.TimeZone;
 
 public final class Constants {
 
-	//suse
-	public static final int NEW_FEE_CALCULATION_BLOCK = 54000;
-	public static final String COIN_NAME = "WCG";
+    //suse
+    public static final int NEW_FEE_CALCULATION_BLOCK = 0;
+    public static final String COIN_NAME = "WCG";
     public static final boolean isTestnet = Wcg.getBooleanProperty("wcg.isTestnet");
     public static final boolean isOffline = Wcg.getBooleanProperty("wcg.isOffline");
     public static final boolean isLightClient = Wcg.getBooleanProperty("wcg.isLightClient");
@@ -55,7 +55,7 @@ public final class Constants {
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
     public static final int FORGING_DELAY = Wcg.getIntProperty("wcg.forgingDelay");
     public static final int FORGING_SPEEDUP = Wcg.getIntProperty("wcg.forgingSpeedup");
-    public static final int BATCH_COMMIT_SIZE = Wcg.getIntProperty("wcg.batchCommitSize", 100);
+    public static final int BATCH_COMMIT_SIZE = Wcg.getIntProperty("wcg.batchCommitSize", Integer.MAX_VALUE);
 
     public static final byte MAX_PHASING_VOTE_TRANSACTIONS = 10;
     public static final byte MAX_PHASING_WHITELIST_SIZE = 10;
@@ -95,6 +95,7 @@ public final class Constants {
     public static final int MAX_SINGLETON_ASSET_DESCRIPTION_LENGTH = 160;
     public static final int MAX_ASSET_TRANSFER_COMMENT_LENGTH = 1000;
     public static final int MAX_DIVIDEND_PAYMENT_ROLLBACK = 1441;
+    public static final int MAX_INTEREST_PAYMENT_ROLLBACK = 1441;
 
     public static final int MAX_POLL_NAME_LENGTH = 100;
     public static final int MAX_POLL_DESCRIPTION_LENGTH = 1000;

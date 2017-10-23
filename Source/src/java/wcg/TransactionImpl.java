@@ -271,7 +271,7 @@ final class TransactionImpl implements Transaction {
         this.senderId = builder.senderId;
         this.blockTimestamp = builder.blockTimestamp;
         this.fullHash = builder.fullHash;
-        this.ecBlockHeight = builder.ecBlockHeight;
+		this.ecBlockHeight = builder.ecBlockHeight;
         this.ecBlockId = builder.ecBlockId;
 
         List<Appendix.AbstractAppendix> list = new ArrayList<>();
@@ -996,6 +996,18 @@ final class TransactionImpl implements Transaction {
                 throw new WcgException.NotValidException("Transactions of this type must have a valid recipient");
             }
         }
+        
+        // #leopard#
+        // mono payer version : no check on generator
+        if (type.getType()==TransactionType.TYPE_INTEREST) {
+          // verify interest conditions
+          
+          // get recipient interest account record
+          
+          // calculate average balance of the period
+          //this.amountNQT;
+          this.getRecipientId();
+        }
 
         boolean validatingAtFinish = phasing != null && getSignature() != null && PhasingPoll.getPoll(getId()) != null;
         for (Appendix.AbstractAppendix appendage : appendages) {
@@ -1019,7 +1031,7 @@ final class TransactionImpl implements Transaction {
             int blockchainHeight = Wcg.getBlockchain().getHeight();
             long minimumFeeNQT = getMinimumFeeNQT(blockchainHeight);
             if (feeNQT < minimumFeeNQT) {
-                throw new WcgException.NotCurrentlyValidException(String.format("Transaction fee %f " + Constants.COIN_NAME + " less than minimum fee %f " + Constants.COIN_NAME + " at height %d",
+            	throw new WcgException.NotCurrentlyValidException(String.format("Transaction fee %f " + Constants.COIN_NAME + " less than minimum fee %f " + Constants.COIN_NAME + " at height %d",
                         ((double) feeNQT) / Constants.ONE_WCG, ((double) minimumFeeNQT) / Constants.ONE_WCG, blockchainHeight));
             }
             if (blockchainHeight > Constants.FXT_BLOCK && ecBlockId != 0) {
@@ -1037,7 +1049,7 @@ final class TransactionImpl implements Transaction {
         AccountRestrictions.checkTransaction(this, validatingAtFinish);
     }
 
-    // returns false iff double spending
+    // returns false if double spending
     boolean applyUnconfirmed() {
         Account senderAccount = Account.getAccount(getSenderId());
         return senderAccount != null && type.applyUnconfirmed(this, senderAccount);
