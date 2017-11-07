@@ -23,6 +23,11 @@ public interface Fee {
     long getFee(TransactionImpl transaction, Appendix appendage);
 
     Fee DEFAULT_FEE = new Fee.ConstantFee(Constants.ONE_WCG);
+    //Fee DEFAULT_FEE = new Fee.ConstantFee(Constants.TRANSACTION_FEE);
+    //long transactionFee = new Long((Wcg.getIntProperty("wcg.transactionFee", (int) Constants.ONE_WCG))/Wcg.getIntProperty("wcg.reductorFee", 1));
+    //long transactionFee = new Long(Wcg.getIntProperty("wcg.transactionFee", (int) Constants.ONE_WCG));
+    //Fee DEFAULT_FEE = new Fee.ConstantFee(transactionFee);
+    //Fee DEFAULT_FEE = new Fee.ConstantFee(transactionFee);
 
     Fee NONE = new Fee.ConstantFee(0L);
 
@@ -36,6 +41,7 @@ public interface Fee {
 
         @Override
         public long getFee(TransactionImpl transaction, Appendix appendage) {
+        	//return fee/Constants.REDUCTOR_FEE < Constants.ONE_WCG/Constants.REDUCTOR_FEE ? Constants.ONE_WCG/Constants.REDUCTOR_FEE : fee/Constants.REDUCTOR_FEE;
             return fee/Constants.REDUCTOR_FEE;
         }
 
@@ -96,6 +102,44 @@ public interface Fee {
             }
             return fee;
         }
+
+        /*
+        public SizeBasedFee(long constantFee, long feePerSize, int unitSize) {
+        	int height = Wcg.getBlockchain().getHeight();
+        	//Logger.logInfoMessage(String.format("SizeBasedFee constantFee=%d " + Constants.COIN_NAME + " at height %d.", ((long) constantFee), height));
+        	if (height <= Constants.NEW_FEE_CALCULATION_BLOCK) {
+        		this.constantFee = constantFee/Constants.REDUCTOR_FEE < Constants.ONE_WCG/Constants.REDUCTOR_FEE ? Constants.ONE_WCG/Constants.REDUCTOR_FEE : constantFee/Constants.REDUCTOR_FEE;
+        	} else {
+	        	if (constantFee == 0) this.constantFee = constantFee;
+	        	else this.constantFee = constantFee/Constants.REDUCTOR_FEE < Constants.ONE_WCG/Constants.REDUCTOR_FEE ? Constants.ONE_WCG/Constants.REDUCTOR_FEE : constantFee/Constants.REDUCTOR_FEE;
+        	}
+        	//Logger.logInfoMessage(String.format("SizeBasedFee this.constantFee=%d " + Constants.COIN_NAME + " at height %d.", ((long) this.constantFee), height));
+            //this.constantFee = constantFee/Constants.REDUCTOR_FEE;
+            this.feePerSize = feePerSize;
+            this.unitSize = unitSize;
+        }
+
+        // the first size unit is free if constantFee is 0
+        @Override
+        public final long getFee(TransactionImpl transaction, Appendix appendage) {
+        	int height = Wcg.getBlockchain().getHeight();
+            int size = getSize(transaction, appendage) - 1;
+            if (size < 0) {
+                return constantFee;
+            }
+            long fee = (Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize))/Constants.REDUCTOR_FEE);
+        	//Logger.logInfoMessage(String.format("getFee fee=%d " + Constants.COIN_NAME + " at height %d.", ((long) fee), height));
+        	if (height <= Constants.NEW_FEE_CALCULATION_BLOCK) {
+        		return fee < Constants.ONE_WCG/Constants.REDUCTOR_FEE ? Constants.ONE_WCG/Constants.REDUCTOR_FEE : fee;
+        	}
+        	if (fee == 0) return fee;
+            return fee < Constants.ONE_WCG/Constants.REDUCTOR_FEE ? Constants.ONE_WCG/Constants.REDUCTOR_FEE : fee;
+            //return fee;
+            //return (Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize))/Constants.REDUCTOR_FEE);
+            //return (Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize))/Wcg.getIntProperty("wcg.reductorFee", 1));
+            //return Math.addExact(constantFee, Math.multiplyExact((long) (size / unitSize), feePerSize));
+        }
+        */
 
         public abstract int getSize(TransactionImpl transaction, Appendix appendage);
 

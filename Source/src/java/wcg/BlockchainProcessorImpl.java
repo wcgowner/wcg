@@ -21,7 +21,7 @@ import wcg.db.DbIterator;
 import wcg.db.DerivedDbTable;
 import wcg.db.FilteringIterator;
 import wcg.db.FullTextTrigger;
-import wcg.interest.InterestManager;
+import wcg.InterestManager;
 import wcg.peer.Peer;
 import wcg.peer.Peers;
 import wcg.util.Convert;

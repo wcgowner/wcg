@@ -31,7 +31,7 @@ import wcg.util.Logger;
 import wcg.util.ThreadPool;
 import wcg.util.Time;
 import org.json.simple.JSONObject;
-import wcg.interest.InterestManager;
+import wcg.InterestManager;
 
 import java.io.File;
 import java.io.FileInputStream;

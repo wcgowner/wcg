@@ -1188,10 +1188,12 @@ class WcgDbVersion extends DbVersion {
             case 489:
                 apply("CREATE INDEX IF NOT EXISTS asset_dividend_height_idx ON asset_dividend (height)");
             case 490:
+                apply("CREATE TABLE IF NOT EXISTS interest_account (account_id BIGINT NOT NULL, payment_number INT NOT NULL, begin INT NOT NULL, end INT NOT NULL, balance BIGINT NULL, payment_id INT NULL, next BOOLEAN NOT NULL DEFAULT TRUE, timestamp INT NOT NULL, PRIMARY KEY(account_id, payment_number))");
+						case 491:
                 apply("CREATE TABLE IF NOT EXISTS interest_balance (account_id BIGINT NOT NULL, height INT NOT NULL, balance BIGINT NOT NULL, timestamp INT NOT NULL, PRIMARY KEY(account_id, height))");    
-            case 491:
-                apply("CREATE TABLE IF NOT EXISTS interest_account (account_id BIGINT NOT NULL, payment_number INT NOT NULL, begin INT NOT NULL, end INT NOT NULL, balance BIGINT NULL, transaction_id BIGINT NULL, next BOOLEAN NOT NULL DEFAULT TRUE, timestamp INT NOT NULL, PRIMARY KEY(account_id, payment_number))");    
-            case 492:
+						case 492:
+								apply("CREATE TABLE IF NOT EXISTS interest_payment (id IDENTITY, height INT NOT NULL, amount BIGINT, accounts_number INT, transaction_id BIGINT NULL, transaction_height INT NULL, timestamp INT NOT NULL)");
+            case 493:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
