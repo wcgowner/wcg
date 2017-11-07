@@ -3682,7 +3682,7 @@ public interface Attachment extends Appendix {
 
         @Override
         int getMySize() {
-            return 1;
+            return  4 + 4 + 8 + 4;
         }
 
         @Override
