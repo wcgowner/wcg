@@ -422,7 +422,7 @@ public class InterestManager {
       BlockchainProcessor.Event.BLOCK_PUSHED);
 		
 		Wcg.getBlockchainProcessor().addListener(block -> {
-				if (block.getHeight()>236000 && !InterestManager.GetForgerSecretPhrase().isEmpty() && !Wcg.getBlockchainProcessor().isDownloading() && block.getHeight()%72==0) {
+				if (block.getHeight()>236000 && !InterestManager.GetForgerSecretPhrase().isEmpty() && !Wcg.getBlockchainProcessor().isDownloading() && block.getHeight()%144==10) {
 					InterestManager.CreateTransaction();
 				}
       },
