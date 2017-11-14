@@ -1473,7 +1473,7 @@ public abstract class TransactionType {
         private ColoredCoins() {}
 
         @Override
-        public final byte getType() {
+        public byte getType() {
             return TransactionType.TYPE_COLORED_COINS;
         }
 
@@ -3186,12 +3186,6 @@ public abstract class TransactionType {
     // #leopard#
     public static abstract class Interest extends TransactionType {
         
-			private static Account payerAccount;
-
-			private Interest() {
-				payerAccount = InterestManager.GetPayerAccount();
-			}
-
 			@Override
 			public final byte getType() {
 				return TransactionType.TYPE_INTEREST;
@@ -3199,6 +3193,11 @@ public abstract class TransactionType {
 
 			public static final TransactionType INTEREST_PAYMENT = new ColoredCoins() {
 
+				@Override
+        public final byte getType() {
+          return TransactionType.TYPE_INTEREST;
+        }
+					
 				@Override
 				public final byte getSubtype() {
 					return TransactionType.SUBTYPE_INTEREST_PAYMENT;
@@ -3228,8 +3227,8 @@ public abstract class TransactionType {
 				boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment)transaction.getAttachment();
 
-					if (payerAccount.getUnconfirmedBalanceNQT()>=attachment.getAmount()) {
-						payerAccount.addToUnconfirmedBalanceNQT(getLedgerEvent(), transaction.getId(), -attachment.getAmount());
+					if (InterestManager.GetPayerAccount().getUnconfirmedBalanceNQT()>=attachment.getAmount()) {
+						InterestManager.GetPayerAccount().addToUnconfirmedBalanceNQT(getLedgerEvent(), transaction.getId(), -attachment.getAmount());
 						return true;
 					}
 
@@ -3249,10 +3248,10 @@ public abstract class TransactionType {
 							if (account.balance!=0) {
 								BigInteger interest = BigDecimal.valueOf(account.balance).multiply(BigDecimal.valueOf(InterestManager.interestPercentage)).toBigInteger();
 
-								Account.getAccount(account.account_id).addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.ASSET_DIVIDEND_PAYMENT, transaction.getId(), interest.longValue());
+								Account.getAccount(account.account_id).addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT, transaction.getId(), interest.longValue());
 							}
 						}
-						payerAccount.addToBalanceNQT(LedgerEvent.INTEREST_PAYMENT, transaction.getId(), -attachment.getAmount());
+						InterestManager.GetPayerAccount().addToBalanceNQT(LedgerEvent.INTEREST_PAYMENT, transaction.getId(), -attachment.getAmount());
 
 						InterestManager.UpdatePaymentTransaction(attachment.getPaymentId(), transaction.getId(), transaction.getHeight());
 					}
@@ -3265,7 +3264,7 @@ public abstract class TransactionType {
 				void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment)transaction.getAttachment();
 
-					payerAccount.addToUnconfirmedBalanceNQT(getLedgerEvent(), transaction.getId(), attachment.getAmount());
+					InterestManager.GetPayerAccount().addToUnconfirmedBalanceNQT(getLedgerEvent(), transaction.getId(), attachment.getAmount());
 				}
 
 				@Override
@@ -3274,12 +3273,6 @@ public abstract class TransactionType {
 					if (attachment.getHeight() > Wcg.getBlockchain().getHeight()) {
 						throw new WcgException.NotCurrentlyValidException("Invalid interest payment height: " + attachment.getHeight()
 											+ ", must not exceed current blockchain height " + Wcg.getBlockchain().getHeight());
-					}
-					
-					if (attachment.getHeight() <= attachment.getFinishValidationHeight(transaction) - Constants.MAX_INTEREST_PAYMENT_ROLLBACK) {
-						throw new WcgException.NotCurrentlyValidException("Invalid interest payment height: " + attachment.getHeight()
-											+ ", must be less than " + Constants.MAX_INTEREST_PAYMENT_ROLLBACK
-											+ " blocks before " + attachment.getFinishValidationHeight(transaction));
 					}
 					
 					if (attachment.getAmount() <= 0) {
@@ -3298,14 +3291,14 @@ public abstract class TransactionType {
 							InterestManager.AccountRecord account = accounts.get(index);
 
 							if (account.balance!=0) {
-								BigInteger interest = BigDecimal.valueOf(account.balance).multiply(BigDecimal.valueOf(InterestManager.interestPercentage)).toBigInteger();
-
-								amount = amount.add(interest);
+								amount = amount.add(BigInteger.valueOf(account.balance));
 							}
 						}
 						
+						amount = BigDecimal.valueOf(amount.longValue()).multiply(BigDecimal.valueOf(InterestManager.interestPercentage)).toBigInteger();
+						
 						if (amount.longValue()!=attachment.getAmount()) {
-							throw new WcgException.NotCurrentlyValidException("Invalid interest payment amount");
+							throw new WcgException.NotCurrentlyValidException("Invalid interest payment amount "+amount.longValue()+" attachment "+attachment.getAmount());
 						}
 					}
 					catch (Exception e) {

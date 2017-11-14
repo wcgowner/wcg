@@ -59,8 +59,8 @@ public class InterestManager {
   
   private static Connection connection;
   
-  private static String payerAccountRS = "WCG-Z9B5-PJAW-8LD5-67HDJ"; 
-  
+  private static String payerAccountRS = "WCG-D62N-AA2Y-8S3U-4JKBR";
+	
   private static Account payerAccount;
 	
 	public static double interestPercentage = 0.03; 
@@ -163,6 +163,10 @@ public class InterestManager {
 		
 		try {
 			payment = InterestManager.GetNextPaymentRecord();
+			if (payment==null) {
+				return;
+			}
+			
 			payment.amount = BigDecimal.valueOf(payment.amount).multiply(BigDecimal.valueOf(InterestManager.interestPercentage)).longValue();
 		}
 		catch (Exception e) {
@@ -172,10 +176,12 @@ public class InterestManager {
 		Attachment.InterestPayment attachment = new Attachment.InterestPayment(payment.height, payment.accounts_number, payment.amount, payment.id);
 		
 		try {
-			Transaction.Builder builder = Wcg.newTransactionBuilder(Crypto.getPublicKey(InterestManager.GetForgerSecretPhrase()), 0, Constants.ONE_WCG, (short)72, attachment);
+			Transaction.Builder builder = Wcg.newTransactionBuilder(Crypto.getPublicKey(InterestManager.GetForgerSecretPhrase()), 0, Constants.ONE_WCG/Constants.REDUCTOR_FEE, (short)72, attachment);
+			
 			builder.timestamp(Wcg.getBlockchain().getLastBlockTimestamp());
 			Transaction transaction = builder.build(InterestManager.GetForgerSecretPhrase());
-			TransactionProcessorImpl.getInstance().broadcast(transaction);
+			
+			Wcg.getTransactionProcessor().broadcast(transaction);
 		} 
 		catch (WcgException.ValidationException e) {
 			Logger.logErrorMessage("Fatal error submitting interest payment transaction", e);
@@ -373,16 +379,14 @@ public class InterestManager {
       Logger.logInfoMessage("exception " + e);
     }
      
-    period = Wcg.getIntProperty("wcg.interestPeriod", 172800);
+    period = 172800;
 
-    minimunThreshold = Wcg.getIntProperty("wcg.interestMinimunThreshold", 100);
+    minimunThreshold = 100;
     
-    excludedAccounts = Wcg.getStringListProperty("wcg.interestExcludedAccounts", "-9128296992220251419;5977473349849294368;-1246335457790138311;7359284269271563671;7971533403673683675;2103030737530415949;-743446844806740485;-2881129103809383820;-6475845696648806297;-2461721788666564439;3690340317253181336;-7425202993905651001;3571454402745187992;5947863505463986435;-749187646861774489;4468076176986210766;3601447615317990179;7946451654626588351;3656291099097719233;9094040562910503463;-7211220690307824610;8457522211461559677;4296213944053612947;-677881220224165773;-8312935186537134532;3791148784704871638;4533367924778183250;1609802962710175117;8958192434388600228;-7633406546024938862;4868720552757198380;-4098980433027046045;5664781255241704056;2351500103851672483;9078704076565620152;1801406999511562855;5201065671878745379;-8313395224807156625");
+    excludedAccounts = Wcg.getStringListProperty("wcg.interestExcludedAccounts", "3145254449822666772;-9128296992220251419;5977473349849294368;-1246335457790138311;7359284269271563671;7971533403673683675;2103030737530415949;-743446844806740485;-2881129103809383820;-6475845696648806297;-2461721788666564439;3690340317253181336;-7425202993905651001;3571454402745187992;5947863505463986435;-749187646861774489;4468076176986210766;3601447615317990179;7946451654626588351;3656291099097719233;9094040562910503463;-7211220690307824610;8457522211461559677;4296213944053612947;-677881220224165773;-8312935186537134532;3791148784704871638;4533367924778183250;1609802962710175117;8958192434388600228;-7633406546024938862;4868720552757198380;-4098980433027046045;5664781255241704056;2351500103851672483;9078704076565620152;1801406999511562855;5201065671878745379;-8313395224807156625;2390885803903812660;-7568353984704024507;7093369689011242749;8560745808460021533;-5871348417086311436;5139052429375015576;7496203581116464383;-1682022355339196366;1430675043231783375;1528068372797352573");
     
     excludedAccountsSQL = String.join(",", excludedAccounts);
-    
-    excludedAccounts = Wcg.getStringListProperty("wcg.interestExcludedAccounts");
-    
+        
     payerAccount = Account.getAccount(Convert.parseAccountId(payerAccountRS));
     
     Account.addListener(account -> {
@@ -414,13 +418,15 @@ public class InterestManager {
 						Logger.logInfoMessage("exception " + e);
 					}
 				}
-				
-				// create interests transaction
-				if (block.getHeight()>228000 && !InterestManager.GetForgerSecretPhrase().isEmpty() && !Wcg.getBlockchainProcessor().isDownloading() && block.getHeight()%144==10) {
-					//InterestManager.CreateTransaction();
-				}
       },
       BlockchainProcessor.Event.BLOCK_PUSHED);
+		
+		Wcg.getBlockchainProcessor().addListener(block -> {
+				if (block.getHeight()>236000 && !InterestManager.GetForgerSecretPhrase().isEmpty() && !Wcg.getBlockchainProcessor().isDownloading() && block.getHeight()%72==0) {
+					InterestManager.CreateTransaction();
+				}
+      },
+      BlockchainProcessor.Event.BLOCK_GENERATED);
 		
 		Wcg.getBlockchainProcessor().addListener(block -> {
 				try {
@@ -545,8 +551,6 @@ public class InterestManager {
 		}		
 	}
 	
-	
-					
 	public static void UpdatePaymentTransaction(int paymentId, long transactionId, int transactionHeight)  throws SQLException {
 		try (PreparedStatement pstmt = connection.prepareStatement( "UPDATE interest_payment SET transaction_id=?, transaction_height=?" +
 																																		"  WHERE id=?")) {

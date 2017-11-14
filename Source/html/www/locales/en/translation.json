@@ -1659,6 +1659,7 @@
   "asset_bid_order_cancellation": "Bid Order Cancellation",
   "asset_bid_order_placement": "Bid Order Placement",
   "asset_dividend_payment": "Dividend Payment",
+  "interest_payment": "Interest Payment",
   "asset_trade": "Asset Trade",
   "asset_delete": "Asset Delete",
   "digital_goods_delisted": "Goods Delisted",

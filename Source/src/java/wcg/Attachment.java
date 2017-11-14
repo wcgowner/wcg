@@ -140,16 +140,6 @@ public interface Attachment extends Appendix {
 
     };
 
-    // #leopard#
-    EmptyAttachment INTEREST_PAYMENT = new EmptyAttachment() {
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.Interest.INTEREST_PAYMENT;
-        }
-
-    };
-    
     final class MessagingAliasAssignment extends AbstractAttachment {
 
         private final String aliasName;
@@ -3682,7 +3672,7 @@ public interface Attachment extends Appendix {
 
         @Override
         int getMySize() {
-            return  4 + 4 + 8 + 4;
+            return 4 + 4 + 8 + 4;
         }
 
         @Override
