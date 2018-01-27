@@ -1,11 +1,11 @@
 ----
-# Welcome to Nxt! #
+# Welcome to WCG! #
 
 ----
-## What is Nxt? ##
-Nxt is a modern economic system based on cryptography and blockchain technology.
+## What is WCG? ##
+WCG is a modern economic system based on cryptography and blockchain technology based on NXT.
 
-With Nxt, you can manage and interact with
+With WCG, you can manage and interact with
 
  - your **assets**
  - your **businesses**
@@ -14,22 +14,15 @@ With Nxt, you can manage and interact with
 in such a way that no trusted third parties are required anymore.
 
 ----
-## Get it! ##
-
-  - *pre-packaged* - `https://bitbucket.org/JeanLucPicard/nxt/downloads/nxt-client-{version}.zip`
-
-  - *dependencies*:
+## Dependancies! ##
     - *general* - Java 8
     - *Ubuntu* - `http://www.webupd8.org/2012/09/install-oracle-java-8-in-ubuntu-via-ppa.html`
     - *Debian* - `http://www.webupd8.org/2014/03/how-to-install-oracle-java-8-in-debian.html`
     - *FreeBSD* - `pkg install openjdk8`
-
-  - *repository* - `git clone https://bitbucket.org/JeanLucPicard/nxt.git`
-  
 ----
 ## Run it! ##
 
-  - click on the Nxt icon, or start from the command line:
+  - click on the WCG icon, or start from the command line:
   - Unix: `./start.sh`
   - Mac: `./run.command`
   - Window: `run.bat`
@@ -82,4 +75,16 @@ in such a way that no trusted third parties are required anymore.
     - nxtforum.org
     
 ----
+## Get NXT! ##
 
+  - *pre-packaged* - `https://bitbucket.org/JeanLucPicard/nxt/downloads/nxt-client-{version}.zip`
+
+  - *dependencies*:
+    - *general* - Java 8
+    - *Ubuntu* - `http://www.webupd8.org/2012/09/install-oracle-java-8-in-ubuntu-via-ppa.html`
+    - *Debian* - `http://www.webupd8.org/2014/03/how-to-install-oracle-java-8-in-debian.html`
+    - *FreeBSD* - `pkg install openjdk8`
+
+  - *repository* - `git clone https://bitbucket.org/JeanLucPicard/nxt.git`
+  
+----
