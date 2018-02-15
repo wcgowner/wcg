@@ -308,7 +308,7 @@ public class InterestManager {
 	}
 
 	public static long GetMinimumThreshold(int height){
-		if (height<=336726) {
+		if (height<=336729) {
 			return 100;
 		}
 		
