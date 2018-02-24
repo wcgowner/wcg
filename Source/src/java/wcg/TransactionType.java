@@ -3239,8 +3239,16 @@ public abstract class TransactionType {
 				void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment)transaction.getAttachment();
 
+					String log = "applyAttachment :";
+					log += " id : " + transaction.getId();
+					log += ", type : " + transaction.getType();
+					Logger.logInfoMessage(log);
+					
+					log += ", attachment : " + transaction.getAttachment();
+					Logger.logInfoMessage(log);
+					
 					try {
-						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getPaymentId());
+						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
 
 						for (int index=0; index<accounts.size(); index++) {
 							InterestManager.AccountRecord account = accounts.get(index);
@@ -3253,7 +3261,7 @@ public abstract class TransactionType {
 						}
 						InterestManager.GetPayerAccount().addToBalanceNQT(LedgerEvent.INTEREST_PAYMENT, transaction.getId(), -attachment.getAmount());
 
-						InterestManager.UpdatePaymentTransaction(attachment.getPaymentId(), transaction.getId(), transaction.getHeight());
+						InterestManager.UpdatePaymentTransaction(attachment.getHeight(), transaction.getId(), transaction.getHeight());
 					}
 					catch (Exception e) {
 						Logger.logInfoMessage("Exception " + e);
@@ -3270,6 +3278,20 @@ public abstract class TransactionType {
 				@Override
 				void validateAttachment(Transaction transaction) throws WcgException.ValidationException {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment)transaction.getAttachment();
+					
+					String log = "validateAttachment :";
+					log += " id : " + transaction.getId();
+					log += ", type : " + transaction.getType();
+					Logger.logInfoMessage(log);
+					
+					log += ", attachment : " + transaction.getAttachment();
+					Logger.logInfoMessage(log);
+					
+					if (attachment.getHeight()==355680) {
+						Logger.logInfoMessage("Interest payment height 355680");
+						return;
+					}
+					
 					if (attachment.getHeight() > Wcg.getBlockchain().getHeight()) {
 						throw new WcgException.NotCurrentlyValidException("Invalid interest payment height: " + attachment.getHeight()
 											+ ", must not exceed current blockchain height " + Wcg.getBlockchain().getHeight());
@@ -3280,7 +3302,16 @@ public abstract class TransactionType {
 					}
 					
 					try {
-						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getPaymentId());
+						/*if (Wcg.getBlockchain().getHeight()!=276493) 
+						{
+							if (InterestManager.VerifyPayment(attachment.getHeight())) {
+								Logger.logInfoMessage("double payment "+attachment.getHeight());
+								//throw new WcgException.NotValidException("Interest payment already paid");
+							}
+						}
+						*/
+
+						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
 						
 						if (accounts.size()!=attachment.getNumberAccounts()) {
 							throw new WcgException.NotCurrentlyValidException("Invalid interest payment accounts number");
@@ -3309,7 +3340,7 @@ public abstract class TransactionType {
 				@Override
 				boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String, Integer>> duplicates) {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment) transaction.getAttachment();
-					return Wcg.getBlockchain().getHeight() > Constants.FXT_BLOCK && isDuplicate(Interest.INTEREST_PAYMENT, Long.toUnsignedString(attachment.getPaymentId()), duplicates, true);
+					return Wcg.getBlockchain().getHeight() > Constants.FXT_BLOCK && isDuplicate(Interest.INTEREST_PAYMENT, Long.toUnsignedString(attachment.getHeight()), duplicates, true);
 				}
 
 				@Override

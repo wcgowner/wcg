@@ -1193,7 +1193,14 @@ class WcgDbVersion extends DbVersion {
                 apply("CREATE TABLE IF NOT EXISTS interest_balance (account_id BIGINT NOT NULL, height INT NOT NULL, balance BIGINT NOT NULL, timestamp INT NOT NULL, PRIMARY KEY(account_id, height))");    
 						case 492:
 								apply("CREATE TABLE IF NOT EXISTS interest_payment (id IDENTITY, height INT NOT NULL, amount BIGINT, accounts_number INT, transaction_id BIGINT NULL, transaction_height INT NULL, timestamp INT NOT NULL)");
-            case 493:
+            /*case 493:
+								apply("CREATE TABLE IF NOT EXISTS interest_collect (account_id BIGINT NOT NULL, amount BIGINT, PRIMARY KEY(account_id))");
+                return;*/
+						case 493:
+								apply("ALTER TABLE interest_account ADD COLUMN IF NOT EXISTS payment_height INT NULL");
+						case 494:
+								apply("UPDATE interest_account ia SET ia.payment_height=(SELECT height FROM interest_payment ip WHERE ia.payment_id=ip.id)");
+						case 495:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
