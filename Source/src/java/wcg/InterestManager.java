@@ -59,7 +59,7 @@ public class InterestManager {
   
   private static String payerAccountRS = "WCG-D62N-AA2Y-8S3U-4JKBR";
 	
-  private static Account payerAccount;
+  private static Account payerAccount = null;
 	
 	public static double interestPercentage = 0.03; 
 	
@@ -333,6 +333,10 @@ public class InterestManager {
 	}
 	
   public static Account GetPayerAccount() {
+		if (payerAccount==null) {
+			payerAccount = Account.getAccount(Convert.parseAccountId(payerAccountRS));
+		}
+		
     return payerAccount;
   }
   
@@ -388,8 +392,6 @@ public class InterestManager {
     
     excludedAccountsSQL = String.join(",", excludedAccounts);
         
-    payerAccount = Account.getAccount(Convert.parseAccountId(payerAccountRS));
-    
     Account.addListener(account -> {
         try {
           InterestManager.MergeBalance(connection, account.getId(), Wcg.getBlockchain().getHeight(), account.getBalanceNQT(), Wcg.getEpochTime());
