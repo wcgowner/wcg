@@ -605,8 +605,7 @@ public class InterestManager {
         AccountRecord account;
 
         while (rs.next()) {
-					
-					if (!InterestManager.excludedAccounts.isEmpty() && InterestManager.excludedAccounts.contains(rs.getLong("account_id"))) {
+					if (!InterestManager.excludedAccounts.isEmpty() && InterestManager.excludedAccounts.contains(String.valueOf(rs.getLong("account_id")))) {
 						continue;
 					}
           
