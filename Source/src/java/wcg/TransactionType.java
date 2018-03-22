@@ -3239,14 +3239,6 @@ public abstract class TransactionType {
 				void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment)transaction.getAttachment();
 
-					String log = "applyAttachment :";
-					log += " id : " + transaction.getId();
-					log += ", type : " + transaction.getType();
-					Logger.logInfoMessage(log);
-					
-					log += ", attachment : " + transaction.getAttachment();
-					Logger.logInfoMessage(log);
-					
 					try {
 						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
 
@@ -3278,14 +3270,6 @@ public abstract class TransactionType {
 				@Override
 				void validateAttachment(Transaction transaction) throws WcgException.ValidationException {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment)transaction.getAttachment();
-					
-					String log = "validateAttachment :";
-					log += " id : " + transaction.getId();
-					log += ", type : " + transaction.getType();
-					Logger.logInfoMessage(log);
-					
-					log += ", attachment : " + transaction.getAttachment();
-					Logger.logInfoMessage(log);
 					
 					if (attachment.getHeight()==355680) {
 						Logger.logInfoMessage("Interest payment height 355680");

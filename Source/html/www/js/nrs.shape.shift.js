@@ -380,7 +380,14 @@ var NRS = (function(NRS, $) {
         });
     }
 
-
+/* Exception for USDTK, should changed to USD to USDTK not USDTK to USDTK - 2018/03/19 */
+    function coinException(coins){
+    	if(coins=="USDTK")
+    		return "USD";
+    	else
+    		return coins;
+    }
+    
     function loadDepositCoins() {
     	if (depositButtonLoaded == 1) return;
     	var exchange_deposit_div_button = $("#exchange_deposit_div_button");
@@ -394,10 +401,12 @@ var NRS = (function(NRS, $) {
                 NRS.sendRequest("getAsset", {
                     "asset": response.assetIds[foundAsset]
                 }, function (response) {
-                    //console.log(response.name);
-                    buttonTxt = $.t("exchange_deposit_button", { coin: response.name });
-                    newButton = '<a class="btn btn-default" href="#" id="exchange_deposit_'+response.name+'" data-toggle="modal" data-target="#deposit_coin_modal" coin-type="'+response.name+'">'+buttonTxt+'</a>&nbsp;';
-                    if (response.quantityQNT > 0) exchange_deposit_div_button.append(newButton);
+                    //console.log("--"+response.name);
+                    if( (response.name!="USD") && (response.name!="RMB") ){
+	                    buttonTxt = $.t("exchange_deposit_button", { coinf: coinException(response.name), coin: response.name });
+	                    newButton = '<a class="btn btn-default" href="#" id="exchange_deposit_'+response.name+'" data-toggle="modal" data-target="#deposit_coin_modal" coin-type="'+response.name+'">'+buttonTxt+'</a>&nbsp;';
+	                    if (response.quantityQNT > 0) exchange_deposit_div_button.append(newButton);
+	            }
                 });
             }
         });
@@ -410,11 +419,12 @@ var NRS = (function(NRS, $) {
         var selectedCoins = [];
         var newButton = [];
         selectedCoins.push(NRS.settings.exchange_coin0);
-        selectedCoins.push(NRS.settings.exchange_coin1);
-        selectedCoins.push(NRS.settings.exchange_coin2);
+        /* removed coin USB and RMB */
+        //selectedCoins.push(NRS.settings.exchange_coin1);
+        //selectedCoins.push(NRS.settings.exchange_coin2);
         for (var i = 0; i < selectedCoins.length; i++) {
-            buttonTxt = $.t("exchange_deposit_button", { coin: selectedCoins[i] });
-        	newButton[i] = '<a class="btn btn-default" href="#" id="exchange_deposit_'+selectedCoins[i]+'" data-toggle="modal" data-target="#deposit_coin_modal" coin-type="'+selectedCoins[i]+'">'+buttonTxt+'</a>';
+            buttonTxt = $.t("exchange_deposit_button", { coinf: coinException(selectedCoins[i]), coin: selectedCoins[i] });
+            newButton[i] = '<a class="btn btn-default" href="#" id="exchange_deposit_'+selectedCoins[i]+'" data-toggle="modal" data-target="#deposit_coin_modal" coin-type="'+selectedCoins[i]+'">'+buttonTxt+'</a>';
         	//exchange_deposit_div_button.append(newButton);
         }
         return newButton;
@@ -424,17 +434,20 @@ var NRS = (function(NRS, $) {
         var invoker = $(e.relatedTarget);
         var agentEmail= "acc@wcgacc.com";
         var coin = invoker.attr("coin-type");
+        /* special exception for usdtk */
+        var coinf = coinException(coin);
         var title = invoker.text();
         $("#deposit_coin_modal_title").html(title);
         //$("#exchange_deposit_mail").html($.t("exchange_deposit_mail", { coin: coin, agentEmail: "wcg_agent@email.com" }));
-        var agentEmailLink = getDepositLink(agentEmail, coin);
+        // change email for each coin according to coin name - codec - 2018/03/15
+        var agentEmailLink = getDepositLink(coin.toLowerCase() + '@wco.me', coinf, coin);
         //$("#exchange_deposit_mail").html("<a target='_blank' href='mailto:"+agentEmail+"'>" + $.t("exchange_deposit_mail", { coin: coin, agentEmail: agentEmail }) + "</a>");
-        $("#exchange_deposit_mail").html($.t("exchange_deposit_mail", { coin: coin, agentEmail: agentEmailLink }));
+        $("#exchange_deposit_mail").html($.t("exchange_deposit_mail", { coinf: coinf, coin: coin, agentEmail: agentEmailLink }));
         NRS.logConsole("modal invoked deposit " + coin);
     });
     
-    var getDepositLink = function (address, coin) {
-    	return "<a href='mailto:"+address+"?subject=Deposit request from "+coin+" to "+coin+" Asset from "+String(NRS.accountRS).escapeHTML()+"'>" + address + "</a>";
+    var getDepositLink = function (address, coinf, coin) {
+    	return "<a href='mailto:"+address+"?subject=Deposit request from "+coinf+" to "+coin+" Asset from "+String(NRS.accountRS).escapeHTML()+"'>" + address + "</a>";
     	//<a href="mailto:email@email.com?subject=Deposit request for USD from DBN-M8Y4-78AP-ZUYA-9XK3C">email@email.com</a>
     };
 
