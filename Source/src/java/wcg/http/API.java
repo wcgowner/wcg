@@ -383,7 +383,7 @@ public final class API {
                 }
                 passwordCount.count++;
                 passwordCount.time = now;
-                Logger.logWarningMessage("Incorrect adminPassword from " + remoteHost);
+                Logger.logWarningMessage("Incorrect adminPassword from " + remoteHost + " URI " + req.getRequestURI() );
                 throw new ParameterException(INCORRECT_ADMIN_PASSWORD);
             }
             if (passwordCount != null) {
