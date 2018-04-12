@@ -1204,6 +1204,7 @@ class WcgDbVersion extends DbVersion {
             case 497:
                 apply("CREATE INDEX IF NOT EXISTS interest_account_payment_height_idx ON interest_account (payment_height)");
             case 498:
+                return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
         }
