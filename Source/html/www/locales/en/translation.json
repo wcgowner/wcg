@@ -1341,7 +1341,7 @@
   "forging_another_account_tooltip": "Forging with account  __accountRS__",
   "forging_more_than_one_tooltip": "Forging with __generators__ accounts",
   "not_forging_not_started_tooltip": "Forging not started",
-  "forging_unknown_tooltip": "Cannot determine forging status, please define administrator password",
+  "forging_unknown_tooltip": "Cannot determine forging status",
   "forging_stopped_tooltip": "Forging stopped",
   "phasing_only": "Mandatory Approval",
   "mandatory_approval_info": "All subsequent transactions will be mandatory approved (phased) according to whatever is set below. Once set, this account control can only be removed with the approval of the accounts/stake holders set below.",

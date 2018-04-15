@@ -3846,3 +3846,7 @@ body > .header .navbar {
 }
 
 /* @media min-height: 400px */
+
+#settings_admin_password_div{
+  display: none;
+}

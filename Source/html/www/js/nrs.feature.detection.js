@@ -193,7 +193,8 @@ var NRS = (function (NRS) {
     };
 
     NRS.isFundingMonitorSupported = function() {
-        return !NRS.isMobileApp() && !(NRS.state && NRS.state.apiProxy);
+        return false;
+        //return !NRS.isMobileApp() && !(NRS.state && NRS.state.apiProxy);
     };
 
     NRS.isShufflingSupported = function() {
