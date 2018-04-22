@@ -4,4 +4,4 @@ if [ -x jre/bin/java ]; then
 else
     JAVA=java
 fi
-${JAVA} -cp classes:lib/*:conf:addons/classes:addons/lib/* wcg.Wcg
+${JAVA} -cp classes:lib/*:conf:addons/classes:addons/lib/* -server wcg.Wcg

@@ -57,7 +57,7 @@
 	)
 
 :startJava	
-	start "WCG NRS from %~dp0" "%javaDir%"\bin\java.exe -cp classes;lib\*;conf;addons\classes;addons\lib\* -Dwcg.runtime.mode=desktop wcg.Wcg
+	start "WCG NRS from %~dp0" "%javaDir%"\bin\java.exe -cp classes;lib\*;conf;addons\classes;addons\lib\* -Dwcg.runtime.mode=server -server wcg.Wcg
 
 :endProcess 
 	endlocal
