@@ -1189,24 +1189,24 @@ class WcgDbVersion extends DbVersion {
                 apply("CREATE INDEX IF NOT EXISTS asset_dividend_height_idx ON asset_dividend (height)");
             case 490:
                 apply("CREATE TABLE IF NOT EXISTS interest_account (account_id BIGINT NOT NULL, payment_number INT NOT NULL, begin INT NOT NULL, end INT NOT NULL, balance BIGINT NULL, payment_id INT NULL, next BOOLEAN NOT NULL DEFAULT TRUE, timestamp INT NOT NULL, PRIMARY KEY(account_id, payment_number))");
-			case 491:
-                apply("CREATE TABLE IF NOT EXISTS interest_balance (account_id BIGINT NOT NULL, height INT NOT NULL, balance BIGINT NOT NULL, timestamp INT NOT NULL, PRIMARY KEY(account_id, height))");    
-			case 492:
-				apply("CREATE TABLE IF NOT EXISTS interest_payment (id IDENTITY, height INT NOT NULL, amount BIGINT, accounts_number INT, transaction_id BIGINT NULL, transaction_height INT NULL, timestamp INT NOT NULL)");
-			case 493:
-				apply("ALTER TABLE interest_account ADD COLUMN IF NOT EXISTS payment_height INT NULL");
-			case 494:
-				apply("UPDATE interest_account ia SET ia.payment_height=(SELECT height FROM interest_payment ip WHERE ia.payment_id=ip.id)");
-			case 495:
-                apply("CREATE INDEX IF NOT EXISTS interest_balance_account_id_idx ON interest_balance (account_id)");
-            case 496:
-                apply("CREATE INDEX IF NOT EXISTS interest_account_end_idx ON interest_account (end)");
-            case 497:
-                apply("CREATE INDEX IF NOT EXISTS interest_account_payment_height_idx ON interest_account (payment_height)");
-            case 498:
-                return;
-            default:
-                throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
+						case 491:
+								apply("CREATE TABLE IF NOT EXISTS interest_balance (account_id BIGINT NOT NULL, height INT NOT NULL, balance BIGINT NOT NULL, timestamp INT NOT NULL, PRIMARY KEY(account_id, height))");    
+						case 492:
+								apply("CREATE TABLE IF NOT EXISTS interest_payment (id IDENTITY, height INT NOT NULL, amount BIGINT, accounts_number INT, transaction_id BIGINT NULL, transaction_height INT NULL, timestamp INT NOT NULL)");
+						case 493:
+								apply("ALTER TABLE interest_account ADD COLUMN IF NOT EXISTS payment_height INT NULL");
+						case 494:
+								apply("UPDATE interest_account ia SET ia.payment_height=(SELECT height FROM interest_payment ip WHERE ia.payment_id=ip.id)");
+						case 495:
+								apply("CREATE INDEX IF NOT EXISTS interest_balance_account_id_idx ON interest_balance (account_id)");
+						case 496:
+								apply("CREATE INDEX IF NOT EXISTS interest_account_end_idx ON interest_account (end)");
+						case 497:
+								apply("CREATE INDEX IF NOT EXISTS interest_account_payment_height_idx ON interest_account (payment_height)");
+						case 498:
+								return;
+						default:
+							throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
         }
     }
 }

@@ -16,6 +16,6 @@ if [ -x jre/bin/java ]; then
 else
     JAVA=java
 fi
-nohup ${JAVA} -cp classes:lib/*:conf:addons/classes:addons/lib/* -Dwcg.runtime.mode=server -server wcg.Wcg > /dev/null 2>&1 &
+nohup ${JAVA} -cp classes:lib/*:conf:addons/classes:addons/lib/* -Dwcg.runtime.mode=desktop wcg.Wcg > /dev/null 2>&1 &
 echo $! > ~/.wcg/wcg.pid
 cd - > /dev/null

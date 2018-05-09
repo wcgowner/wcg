@@ -24,6 +24,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import javax.sql.DataSource;
+
 public class BasicDb {
 
     public static final class DbProperties {
@@ -108,6 +112,8 @@ public class BasicDb {
     private final int maxMemoryRows;
     private volatile boolean initialized = false;
 
+		private static DataSource datasource;
+		
     public BasicDb(DbProperties dbProperties) {
         long maxCacheSize = dbProperties.maxCacheSize;
         if (maxCacheSize == 0) {
@@ -135,8 +141,32 @@ public class BasicDb {
 
     public void init(DbVersion dbVersion) {
         Logger.logDebugMessage("Database jdbc url set to %s username %s", dbUrl, dbUsername);
-        FullTextTrigger.setActive(true);
-        cp = JdbcConnectionPool.create(dbUrl, dbUsername, dbPassword);
+        //FullTextTrigger.setActive(true);
+				
+				HikariConfig config = new HikariConfig();
+				config.setJdbcUrl(dbUrl);
+
+				config.setUsername(dbUsername);
+				config.setPassword(dbPassword);
+				config.setMaximumPoolSize(30);
+				config.setAutoCommit(false);
+				config.addDataSourceProperty("cachePrepStmts", "true");
+				config.addDataSourceProperty("prepStmtCacheSize", "250");
+				config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+					
+				datasource = new HikariDataSource(config);
+				
+				try (Connection con = datasource.getConnection();
+					Statement stmt = con.createStatement()) {
+					stmt.executeUpdate("SET DEFAULT_LOCK_TIMEOUT " + defaultLockTimeout);
+					stmt.executeUpdate("SET MAX_MEMORY_ROWS " + maxMemoryRows);
+        } 
+				catch (SQLException e) {
+          throw new RuntimeException(e.toString(), e);
+        }
+				
+        /*
+				cp = JdbcConnectionPool.create(dbUrl, dbUsername, dbPassword);
         cp.setMaxConnections(maxConnections);
         cp.setLoginTimeout(loginTimeout);
         try (Connection con = cp.getConnection();
@@ -146,6 +176,8 @@ public class BasicDb {
         } catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         }
+				*/
+				
         dbVersion.init(this);
         initialized = true;
     }
@@ -155,8 +187,9 @@ public class BasicDb {
             return;
         }
         try {
-            FullTextTrigger.setActive(false);
-            Connection con = cp.getConnection();
+            //FullTextTrigger.setActive(false);
+            //Connection con = cp.getConnection();
+						Connection con = datasource.getConnection();
             Statement stmt = con.createStatement();
             stmt.execute("SHUTDOWN COMPACT");
             Logger.logShutdownMessage("Database shutdown completed");
@@ -166,7 +199,7 @@ public class BasicDb {
     }
 
     public void analyzeTables() {
-        try (Connection con = cp.getConnection();
+        try (Connection con = datasource.getConnection();
              Statement stmt = con.createStatement()) {
             stmt.execute("ANALYZE SAMPLE_SIZE 0");
         } catch (SQLException e) {
@@ -181,12 +214,12 @@ public class BasicDb {
     }
 
     protected Connection getPooledConnection() throws SQLException {
-        Connection con = cp.getConnection();
-        int activeConnections = cp.getActiveConnections();
+        Connection con = datasource.getConnection();
+        /*int activeConnections = datasource.getActiveConnections();
         if (activeConnections > maxActiveConnections) {
             maxActiveConnections = activeConnections;
             Logger.logDebugMessage("Database connection pool current size: " + activeConnections);
-        }
+        }*/
         return con;
     }
 
