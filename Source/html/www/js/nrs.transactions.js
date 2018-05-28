@@ -676,6 +676,45 @@ var NRS = (function(NRS, $, undefined) {
 		return html;
 	};
 
+    NRS.getAccountInterestEntryRow = function(entry, decimalParams) {
+        var linkClass;
+        var dataToken;
+        
+        var balance = entry.balance;
+        var incorrect_balance = entry.incorrect_balance;
+        var balanceType = "wcg";
+        var balanceEntity = "WCG";
+        
+        balance = NRS.convertToWCG(balance, false);
+        incorrect_balance = NRS.convertToWCG(incorrect_balance, false);
+
+        var html = "";
+        html += "<tr>";
+
+/*
+        html += "<td style='vertical-align:middle;'>";
+        html += "<a class='show_ledger_modal_action' href='#' data-entry='" + NRS.escapeRespStr(entry.ledgerId) +"'";
+        html += "data-change='" + (entry.change < 0 ? ("-" + change) : change) + "' data-balance='" + balance + "'>";
+        html += NRS.formatTimestamp(entry.timestamp) + "</a>";
+        html += "</td>";
+        html += '<td style="vertical-align:middle;">';
+        html += '<span style="font-size:11px;display:inline-block;margin-top:5px;">' + eventType + '</span>';
+        html += "<a class='" + linkClass + "' href='#' data-timestamp='" + NRS.escapeRespStr(entry.timestamp) + "' " + dataToken + ">";
+        html += " <i class='fa fa-info'></i></a>";
+        html += '</td>';
+*/
+
+        html += "<td style='vertical-align:middle;text-align:center;' class='numeric'><a href='/index.html?account=" + entry.account_rs + "'>" + entry.account_rs + "</a></td>";
+        html += "<td style='vertical-align:middle;text-align:center;' class='numeric'><a href='/index.html?account=" + entry.account_rs + "'>" + entry.payment_height + "</a></td>";
+        html += "<td style='vertical-align:middle;text-align:center;' class='numeric'>" + entry.begin + "</td>";
+        html += "<td style='vertical-align:middle;text-align:center;' class='numeric'>" + entry.end + "</td>";
+        html += "<td style='vertical-align:middle;' class='numeric'>" + balance + "</td>";
+        html += "<td style='vertical-align:middle;' class='numeric'>" + incorrect_balance + "</td>";
+        //html += "<td style='vertical-align:middle;text-align:center;' class='numeric'>" + entry.check_height + "</td>";
+
+        return html;
+    };
+
 	NRS.buildTransactionsTypeNavi = function() {
 		var html = '';
 		html += '<li role="presentation" class="active"><a href="#" data-transaction-type="" ';
@@ -846,6 +885,16 @@ var NRS = (function(NRS, $, undefined) {
 		return decimalParams;
 	};
 
+    NRS.getAccountInterestNumberOfDecimals = function (entries){
+        var decimalParams = {};
+        
+        decimalParams.balanceDecimals = 2;
+
+        decimalParams.incorrect_balanceDecimals = 2;
+
+        return decimalParams;
+    };
+
     NRS.pages.ledger = function() {
 		var rows = "";
         var params = {
@@ -862,6 +911,7 @@ var NRS = (function(NRS, $, undefined) {
                     response.entries.pop();
                 }
 				var decimalParams = NRS.getLedgerNumberOfDecimals(response.entries);
+
                 for (var i = 0; i < response.entries.length; i++) {
                     var entry = response.entries[i];
                     rows += NRS.getLedgerEntryRow(entry, decimalParams);
@@ -873,6 +923,45 @@ var NRS = (function(NRS, $, undefined) {
                 ledgerMessage.text($.t("account_ledger_message", { blocks: NRS.ledgerTrimKeep }));
 				ledgerMessage.show();
 			}
+        });
+	};
+
+    NRS.pages.interest = function() {
+	var rows = "";
+        var search_account_rs = '';
+        var search_payment_height = '';
+
+        if ($('#interest_account_rs')!=undefined) {
+            search_account_rs = $('#interest_account_rs').val();
+        }
+
+        if ($('#interest_payment_height')!=undefined) {
+            search_payment_height = $('#interest_payment_height').val();
+        }
+
+        var params = {
+            "account": NRS.account,
+            "includeHoldingInfo": true,
+            "firstIndex": NRS.pageNumber * NRS.itemsPerPage - NRS.itemsPerPage,
+            "lastIndex": NRS.pageNumber * NRS.itemsPerPage,
+            "search_account_rs": search_account_rs,
+            "search_payment_height": search_payment_height
+        };
+
+        NRS.sendRequest("getAccountInterest+", params, function(response) {
+            if (response.entries && response.entries.length) {
+                if (response.entries.length > NRS.itemsPerPage) {
+                    NRS.hasMorePages = true;
+                    response.entries.pop();
+                }
+				var decimalParams = NRS.getAccountInterestNumberOfDecimals(response.entries);
+
+                for (var i = 0; i < response.entries.length; i++) {
+                    var entry = response.entries[i];
+                    rows += NRS.getAccountInterestEntryRow(entry, decimalParams);
+                }
+            }
+            NRS.dataLoaded(rows);
         });
 	};
 
@@ -1027,6 +1116,12 @@ var NRS = (function(NRS, $, undefined) {
 			"titleHTML": '<span data-i18n="account_ledger">Account Ledger</span>',
 			"type": 'PAGE',
 			"page": 'ledger'
+		};
+                NRS.appendMenuItemToTSMenuItem(sidebarId, options);
+		options = {
+			"titleHTML": '<span data-i18n="account_interest">Account Interests</span>',
+			"type": 'PAGE',
+			"page": 'interest'
 		};
 		NRS.appendMenuItemToTSMenuItem(sidebarId, options);
 		options = {

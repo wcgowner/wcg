@@ -48,8 +48,8 @@ public abstract class TransactionType {
     private static final byte TYPE_DATA = 6;
     static final byte TYPE_SHUFFLING = 7;
 
-    // #leopard#
-    static final byte TYPE_INTEREST = 8;
+		static final byte TYPE_INTEREST = 8;
+		static final byte TYPE_INTEREST2 = 9;
   
     private static final byte SUBTYPE_PAYMENT_ORDINARY_PAYMENT = 0;
 
@@ -90,8 +90,8 @@ public abstract class TransactionType {
     private static final byte SUBTYPE_DATA_TAGGED_DATA_UPLOAD = 0;
     private static final byte SUBTYPE_DATA_TAGGED_DATA_EXTEND = 1;
 
-    // #leopard#
     private static final byte SUBTYPE_INTEREST_PAYMENT = 0;
+		private static final byte SUBTYPE_INTEREST_PAYMENT2 = 0;
     
     public static TransactionType findTransactionType(byte type, byte subtype) {
         switch (type) {
@@ -195,7 +195,6 @@ public abstract class TransactionType {
                 }
             case TYPE_SHUFFLING:
                 return ShufflingTransaction.findTransactionType(subtype);
-            // #leopard#
             case TYPE_INTEREST:
               switch (subtype) {
                 case SUBTYPE_INTEREST_PAYMENT:
@@ -203,7 +202,13 @@ public abstract class TransactionType {
                 default:
                   return null;
               }
-            
+            case TYPE_INTEREST2:
+              switch (subtype) {
+                case SUBTYPE_INTEREST_PAYMENT2:
+                  return Interest2.INTEREST_PAYMENT2;
+                default:
+                  return null;
+              }
             default:
                 return null;
         }
@@ -3183,7 +3188,6 @@ public abstract class TransactionType {
 
     }
 
-    // #leopard#
     public static abstract class Interest extends TransactionType {
         
 			@Override
@@ -3271,11 +3275,6 @@ public abstract class TransactionType {
 				void validateAttachment(Transaction transaction) throws WcgException.ValidationException {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment)transaction.getAttachment();
 					
-					if (attachment.getHeight()==355680) {
-						Logger.logInfoMessage("Interest payment height 355680");
-						return;
-					}
-					
 					if (attachment.getHeight() > Wcg.getBlockchain().getHeight()) {
 						throw new WcgException.NotCurrentlyValidException("Invalid interest payment height: " + attachment.getHeight()
 											+ ", must not exceed current blockchain height " + Wcg.getBlockchain().getHeight());
@@ -3286,14 +3285,12 @@ public abstract class TransactionType {
 					}
 					
 					try {
-						/*if (Wcg.getBlockchain().getHeight()!=276493) 
-						{
+						if (Wcg.getBlockchain().getHeight()!=276493) {
 							if (InterestManager.VerifyPayment(attachment.getHeight())) {
-								Logger.logInfoMessage("double payment "+attachment.getHeight());
-								//throw new WcgException.NotValidException("Interest payment already paid");
+								Logger.logInfoMessage("double interest payment "+attachment.getHeight());
+								throw new WcgException.NotValidException("Interest payment already paid");
 							}
 						}
-						*/
 
 						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
 						
@@ -3325,6 +3322,156 @@ public abstract class TransactionType {
 				boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String, Integer>> duplicates) {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment) transaction.getAttachment();
 					return Wcg.getBlockchain().getHeight() > Constants.FXT_BLOCK && isDuplicate(Interest.INTEREST_PAYMENT, Long.toUnsignedString(attachment.getHeight()), duplicates, true);
+				}
+
+				@Override
+				public boolean canHaveRecipient() {
+					return false;
+				}
+
+				@Override
+				public boolean isPhasingSafe() {
+					return false;
+				}
+
+			};
+
+    }
+		
+		public static abstract class Interest2 extends TransactionType {
+        
+			@Override
+			public final byte getType() {
+				return TransactionType.TYPE_INTEREST2;
+			}
+
+			public static final TransactionType INTEREST_PAYMENT2 = new ColoredCoins() {
+
+				@Override
+        public final byte getType() {
+          return TransactionType.TYPE_INTEREST2;
+        }
+					
+				@Override
+				public final byte getSubtype() {
+					return TransactionType.SUBTYPE_INTEREST_PAYMENT2;
+				}
+
+				@Override
+				public LedgerEvent getLedgerEvent() {
+					return LedgerEvent.INTEREST_PAYMENT2;
+				}
+
+				@Override
+				public String getName() {
+					return "InterestPayment2";
+				}
+
+				@Override
+				Attachment.InterestPayment2 parseAttachment(ByteBuffer buffer, byte transactionVersion) {
+					return new Attachment.InterestPayment2(buffer, transactionVersion);
+				}
+
+				@Override
+				Attachment.InterestPayment2 parseAttachment(JSONObject attachmentData) {
+					return new Attachment.InterestPayment2(attachmentData);
+				}
+
+				@Override
+				boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2)transaction.getAttachment();
+
+					if (InterestManager.GetPayerAccount().getUnconfirmedBalanceNQT()>=attachment.getAmount()) {
+						InterestManager.GetPayerAccount().addToUnconfirmedBalanceNQT(getLedgerEvent(), transaction.getId(), -attachment.getAmount());
+						return true;
+					}
+
+					return false;
+				}
+
+				@Override
+				void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2)transaction.getAttachment();
+
+					try {
+						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
+
+						for (int index=0; index<accounts.size(); index++) {
+							InterestManager.AccountRecord account = accounts.get(index);
+
+							if (account.balance!=0) {
+								BigInteger interest = BigDecimal.valueOf(account.balance).multiply(BigDecimal.valueOf(InterestManager.interestPercentage)).toBigInteger();
+
+								Account.getAccount(account.account_id).addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), interest.longValue());
+							}
+						}
+						InterestManager.GetPayerAccount().addToBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), -attachment.getAmount());
+
+						InterestManager.UpdatePaymentTransaction(attachment.getHeight(), transaction.getId(), transaction.getHeight());
+					}
+					catch (Exception e) {
+						Logger.logInfoMessage("Exception " + e);
+					}
+				}
+
+				@Override
+				void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2)transaction.getAttachment();
+
+					InterestManager.GetPayerAccount().addToUnconfirmedBalanceNQT(getLedgerEvent(), transaction.getId(), attachment.getAmount());
+				}
+
+				@Override
+				void validateAttachment(Transaction transaction) throws WcgException.ValidationException {
+					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2)transaction.getAttachment();
+					
+					if (attachment.getHeight() > Wcg.getBlockchain().getHeight()) {
+						throw new WcgException.NotCurrentlyValidException("Invalid interest payment height: " + attachment.getHeight()
+											+ ", must not exceed current blockchain height " + Wcg.getBlockchain().getHeight());
+					}
+					
+					if (attachment.getAmount() <= 0) {
+						throw new WcgException.NotValidException("Invalid interest payment amount " + attachment.getJSONObject());
+					}
+					
+					try {
+						if (attachment.getHeight()!=276480) {
+							if (InterestManager.VerifyPayment(attachment.getHeight())) {
+								Logger.logInfoMessage("double interest payment "+attachment.getHeight());
+								throw new WcgException.NotValidException("Interest payment already paid");
+							}
+						}
+
+						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
+						
+						if (accounts.size()!=attachment.getNumberAccounts()) {
+							throw new WcgException.NotCurrentlyValidException("Invalid interest payment accounts number");
+						}
+						
+						BigInteger amount = BigInteger.valueOf(0);
+						for (int index=0; index<accounts.size(); index++) {
+							InterestManager.AccountRecord account = accounts.get(index);
+
+							if (account.balance!=0) {
+								amount = amount.add(BigInteger.valueOf(account.balance));
+							}
+						}
+						
+						amount = BigDecimal.valueOf(amount.longValue()).multiply(BigDecimal.valueOf(InterestManager.interestPercentage)).toBigInteger();
+						
+						if (amount.longValue()!=attachment.getAmount()) {
+							throw new WcgException.NotCurrentlyValidException("Invalid interest payment amount "+amount.longValue()+" attachment "+attachment.getAmount());
+						}
+					}
+					catch (Exception e) {
+						throw new WcgException.NotCurrentlyValidException("Exception " + e);
+					}
+				}
+
+				@Override
+				boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String, Integer>> duplicates) {
+					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2) transaction.getAttachment();
+					return Wcg.getBlockchain().getHeight() > Constants.FXT_BLOCK && isDuplicate(Interest2.INTEREST_PAYMENT2, Long.toUnsignedString(attachment.getHeight()), duplicates, true);
 				}
 
 				@Override

@@ -353,6 +353,18 @@ var NRS = (function(NRS, $, undefined) {
                     'iconHTML': '<i class="fa fa-money"></i>'
                 }
             }
+        },
+        9: {
+            'title': "Interest",
+            'i18nKeyTitle': 'interest',
+            'iconHTML': '<i class="fa fa-line-chart"></i>',
+            'subTypes': {
+                0: {
+                    'title': "Interest payment",
+                    'i18nKeyTitle': 'interest_payment',
+                    'iconHTML': '<i class="fa fa-money"></i>'
+                }
+            }
         }
     };
     

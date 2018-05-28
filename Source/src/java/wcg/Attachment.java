@@ -86,7 +86,7 @@ public interface Attachment extends Appendix {
 
         @Override
         final boolean isPhasable() {
-            return !(this instanceof Prunable) && getTransactionType().isPhasable();
+            return !(this instanceof Appendix.Prunable) && getTransactionType().isPhasable();
         }
 
         final int getFinishValidationHeight(Transaction transaction) {
@@ -1797,7 +1797,7 @@ public interface Attachment extends Appendix {
 
     }
 
-    final class UnencryptedDigitalGoodsDelivery extends DigitalGoodsDelivery implements Encryptable {
+    final class UnencryptedDigitalGoodsDelivery extends DigitalGoodsDelivery implements Appendix.Encryptable {
 
         private final byte[] goodsToEncrypt;
         private final byte[] recipientPublicKey;
@@ -2880,7 +2880,7 @@ public interface Attachment extends Appendix {
 
     }
 
-    final class ShufflingProcessing extends AbstractShufflingAttachment implements Prunable {
+    final class ShufflingProcessing extends AbstractShufflingAttachment implements Appendix.Prunable {
 
         private static final byte[] emptyDataHash = Crypto.sha256().digest();
 
@@ -3221,7 +3221,7 @@ public interface Attachment extends Appendix {
 
     }
 
-    abstract class TaggedDataAttachment extends AbstractAttachment implements Prunable {
+    abstract class TaggedDataAttachment extends AbstractAttachment implements Appendix.Prunable {
 
         private final String name;
         private final String description;
@@ -3694,6 +3694,80 @@ public interface Attachment extends Appendix {
         @Override
         public TransactionType getTransactionType() {
             return TransactionType.Interest.INTEREST_PAYMENT;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+        
+        public int getNumberAccounts() {
+            return numberAccounts;
+        }
+        
+        public long getAmount() {
+            return amount;
+        }
+				
+				public int getPaymentId() {
+            return paymentId;
+        }
+
+    }
+		
+		final class InterestPayment2 extends AbstractAttachment {
+
+        private final int height;
+        private final int numberAccounts;
+        private final long amount;
+				private final int paymentId;
+
+        InterestPayment2(ByteBuffer buffer, byte transactionVersion) {
+            super(buffer, transactionVersion);
+            this.height = buffer.getInt();
+            this.numberAccounts = buffer.getInt();
+            this.amount = buffer.getLong();
+						this.paymentId = buffer.getInt();
+        }
+
+        InterestPayment2(JSONObject attachmentData) {
+            super(attachmentData);
+            this.height = ((Long)attachmentData.get("height")).intValue();
+            this.numberAccounts = ((Long)attachmentData.get("numberAccounts")).intValue();
+            this.amount = Convert.parseLong(attachmentData.get("amount"));
+						this.paymentId = ((Long)attachmentData.get("paymentId")).intValue();
+        }
+
+        public InterestPayment2(int height, int numberAccounts, long amount, int paymentId) {
+            this.height = height;
+            this.numberAccounts = numberAccounts;
+            this.amount = amount;
+						this.paymentId = paymentId;
+        }
+
+        @Override
+        int getMySize() {
+            return 4 + 4 + 8 + 4;
+        }
+
+        @Override
+        void putMyBytes(ByteBuffer buffer) {
+            buffer.putInt(height);
+            buffer.putInt(numberAccounts);
+            buffer.putLong(amount);
+						buffer.putInt(paymentId);
+        }
+
+        @Override
+        void putMyJSON(JSONObject attachment) {
+            attachment.put("height", height);
+            attachment.put("numberAccounts", numberAccounts);
+            attachment.put("amount", amount);
+						attachment.put("paymentId", paymentId);
+        }
+
+        @Override
+        public TransactionType getTransactionType() {
+            return TransactionType.Interest2.INTEREST_PAYMENT2;
         }
 
         public int getHeight() {

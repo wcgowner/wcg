@@ -983,7 +983,7 @@ class WcgDbVersion extends DbVersion {
             case 414:
                 apply(null);
             case 415:
-                wcg.db.FullTextTrigger.init();
+                //wcg.db.FullTextTrigger.init();
                 apply(null);
             case 416:
                 apply("DROP INDEX IF EXISTS asset_height_idx");
@@ -1204,9 +1204,33 @@ class WcgDbVersion extends DbVersion {
 						case 497:
 								apply("CREATE INDEX IF NOT EXISTS interest_account_payment_height_idx ON interest_account (payment_height)");
 						case 498:
+                apply("CREATE INDEX IF NOT EXISTS interest_balance_height_idx ON interest_balance (height)");
+            case 499:
+                apply("ALTER TABLE interest_balance DROP COLUMN IF EXISTS timestamp");
+            case 500:
+								apply("ALTER TABLE interest_account ADD COLUMN IF NOT EXISTS first_balance BIGINT");
+						case 501:
+								apply("ALTER TABLE interest_account ADD COLUMN IF NOT EXISTS type INT NOT NULL DEFAULT 0");
+						case 502:		
+								apply("ALTER TABLE interest_account ADD COLUMN IF NOT EXISTS wrong_balance BIGINT DEFAULT 0");
+						case 503:
+								apply("ALTER TABLE interest_account DROP PRIMARY KEY");
+						case 504:		
+								apply("ALTER TABLE interest_account ADD CONSTRAINT PK_INTEREST_ACCOUNT PRIMARY KEY (\"ACCOUNT_ID\", \"PAYMENT_NUMBER\", \"TYPE\")");
+						case 505:
+								apply("ALTER TABLE interest_account DROP COLUMN IF EXISTS timestamp");
+						case 506:		
+								apply("ALTER TABLE interest_payment DROP COLUMN IF EXISTS timestamp");
+						case 507:
+								apply("ALTER TABLE interest_payment ALTER COLUMN \"ID\" SET DEFAULT null");
+						case 508:
+								apply("ALTER TABLE interest_payment ALTER COLUMN \"ID\" integer");
+						case 509:
+								apply("ALTER TABLE interest_account ADD COLUMN IF NOT EXISTS check_height INT DEFAULT 0");
+						case 510:
 								return;
 						default:
-							throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
+								throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
         }
     }
 }

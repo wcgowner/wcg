@@ -20,8 +20,6 @@ import wcg.crypto.Crypto;
 import wcg.db.DbIterator;
 import wcg.db.DerivedDbTable;
 import wcg.db.FilteringIterator;
-import wcg.db.FullTextTrigger;
-import wcg.InterestManager;
 import wcg.peer.Peer;
 import wcg.peer.Peers;
 import wcg.util.Convert;
@@ -1390,59 +1388,57 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     }
 
     private void pushBlock(final BlockImpl block) throws BlockNotAcceptedException {
+			int curTime = Wcg.getEpochTime();
 
-        int curTime = Wcg.getEpochTime();
+			blockchain.writeLock();
+			try {
+					BlockImpl previousLastBlock = null;
+					try {
+							Db.db.beginTransaction();
+							previousLastBlock = blockchain.getLastBlock();
 
-        blockchain.writeLock();
-        try {
-            BlockImpl previousLastBlock = null;
-            try {
-                Db.db.beginTransaction();
-                previousLastBlock = blockchain.getLastBlock();
+							validate(block, previousLastBlock, curTime);
 
-                validate(block, previousLastBlock, curTime);
+							long nextHitTime = Generator.getNextHitTime(previousLastBlock.getId(), curTime);
+							if (nextHitTime > 0 && block.getTimestamp() > nextHitTime + 1) {
+									String msg = "Rejecting block " + block.getStringId() + " at height " + previousLastBlock.getHeight()
+													+ " block timestamp " + block.getTimestamp() + " next hit time " + nextHitTime
+													+ " current time " + curTime;
+									Logger.logDebugMessage(msg);
+									Generator.setDelay(-Constants.FORGING_SPEEDUP);
+									throw new BlockOutOfOrderException(msg, block);
+							}
 
-                long nextHitTime = Generator.getNextHitTime(previousLastBlock.getId(), curTime);
-                if (nextHitTime > 0 && block.getTimestamp() > nextHitTime + 1) {
-                    String msg = "Rejecting block " + block.getStringId() + " at height " + previousLastBlock.getHeight()
-                            + " block timestamp " + block.getTimestamp() + " next hit time " + nextHitTime
-                            + " current time " + curTime;
-                    Logger.logDebugMessage(msg);
-                    Generator.setDelay(-Constants.FORGING_SPEEDUP);
-                    throw new BlockOutOfOrderException(msg, block);
-                }
+							Map<TransactionType, Map<String, Integer>> duplicates = new HashMap<>();
+							List<TransactionImpl> validPhasedTransactions = new ArrayList<>();
+							List<TransactionImpl> invalidPhasedTransactions = new ArrayList<>();
+							validatePhasedTransactions(previousLastBlock.getHeight(), validPhasedTransactions, invalidPhasedTransactions, duplicates);
+							validateTransactions(block, previousLastBlock, curTime, duplicates, previousLastBlock.getHeight() >= Constants.LAST_CHECKSUM_BLOCK);
 
-                Map<TransactionType, Map<String, Integer>> duplicates = new HashMap<>();
-                List<TransactionImpl> validPhasedTransactions = new ArrayList<>();
-                List<TransactionImpl> invalidPhasedTransactions = new ArrayList<>();
-                validatePhasedTransactions(previousLastBlock.getHeight(), validPhasedTransactions, invalidPhasedTransactions, duplicates);
-                validateTransactions(block, previousLastBlock, curTime, duplicates, previousLastBlock.getHeight() >= Constants.LAST_CHECKSUM_BLOCK);
+							block.setPrevious(previousLastBlock);
+							blockListeners.notify(block, Event.BEFORE_BLOCK_ACCEPT);
+							TransactionProcessorImpl.getInstance().requeueAllUnconfirmedTransactions();
+							addBlock(block);
+							accept(block, validPhasedTransactions, invalidPhasedTransactions, duplicates);
 
-                block.setPrevious(previousLastBlock);
-                blockListeners.notify(block, Event.BEFORE_BLOCK_ACCEPT);
-                TransactionProcessorImpl.getInstance().requeueAllUnconfirmedTransactions();
-                addBlock(block);
-                accept(block, validPhasedTransactions, invalidPhasedTransactions, duplicates);
+							Db.db.commitTransaction();
+					} catch (Exception e) {
+							Db.db.rollbackTransaction();
+							blockchain.setLastBlock(previousLastBlock);
+							throw e;
+					} finally {
+							Db.db.endTransaction();
+					}
+					blockListeners.notify(block, Event.AFTER_BLOCK_ACCEPT);
+			} finally {
+					blockchain.writeUnlock();
+			}
 
-                Db.db.commitTransaction();
-            } catch (Exception e) {
-                Db.db.rollbackTransaction();
-                blockchain.setLastBlock(previousLastBlock);
-                throw e;
-            } finally {
-                Db.db.endTransaction();
-            }
-            blockListeners.notify(block, Event.AFTER_BLOCK_ACCEPT);
-        } finally {
-            blockchain.writeUnlock();
-        }
+			if (block.getTimestamp() >= curTime - 600) {
+					Peers.sendToSomePeers(block);
+			}
 
-        if (block.getTimestamp() >= curTime - 600) {
-            Peers.sendToSomePeers(block);
-        }
-
-        blockListeners.notify(block, Event.BLOCK_PUSHED);
-
+			blockListeners.notify(block, Event.BLOCK_PUSHED);
     }
 
     private void validatePhasedTransactions(int height, List<TransactionImpl> validPhasedTransactions, List<TransactionImpl> invalidPhasedTransactions,
@@ -1473,7 +1469,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
     private void validate(BlockImpl block, BlockImpl previousLastBlock, int curTime) throws BlockNotAcceptedException {
         if (previousLastBlock.getId() != block.getPreviousBlockId()) {
-            throw new BlockOutOfOrderException("Previous block id doesn't match", block);
+            throw new BlockNotAcceptedException("Previous block id doesn't match", block);
         }
         if (block.getVersion() != getBlockVersion(previousLastBlock.getHeight())) {
             throw new BlockNotAcceptedException("Invalid version " + block.getVersion(), block);
@@ -1588,20 +1584,30 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     private void accept(BlockImpl block, List<TransactionImpl> validPhasedTransactions, List<TransactionImpl> invalidPhasedTransactions,
                         Map<TransactionType, Map<String, Integer>> duplicates) throws TransactionNotAcceptedException {
         try {
+
             isProcessingBlock = true;
             for (TransactionImpl transaction : block.getTransactions()) {
                 if (! transaction.applyUnconfirmed()) {
                     throw new TransactionNotAcceptedException("Double spending", transaction);
                 }
             }
+
             blockListeners.notify(block, Event.BEFORE_BLOCK_APPLY);
+
             block.apply();
+
             validPhasedTransactions.forEach(transaction -> transaction.getPhasing().countVotes(transaction));
+
             invalidPhasedTransactions.forEach(transaction -> transaction.getPhasing().reject(transaction));
+
             int fromTimestamp = Wcg.getEpochTime() - Constants.MAX_PRUNABLE_LIFETIME;
+
             for (TransactionImpl transaction : block.getTransactions()) {
                 try {
+			
                     transaction.apply();
+											
+
                     if (transaction.getTimestamp() > fromTimestamp) {
                         for (Appendix.AbstractAppendix appendage : transaction.getAppendages(true)) {
                             if ((appendage instanceof Appendix.Prunable) &&
@@ -1663,11 +1669,15 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     }
                 });
             }
+
             blockListeners.notify(block, Event.AFTER_BLOCK_APPLY);
+
             if (block.getTransactions().size() > 0) {
                 TransactionProcessorImpl.getInstance().notifyListeners(block.getTransactions(), TransactionProcessor.Event.ADDED_CONFIRMED_TRANSACTIONS);
             }
+
             AccountLedger.commitEntries();
+
         } finally {
             isProcessingBlock = false;
             AccountLedger.clearEntries();
@@ -1987,7 +1997,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 }
                 if (height == 0) {
                     Logger.logDebugMessage("Dropping all full text search indexes");
-                    FullTextTrigger.dropAll(con);
+                    //FullTextTrigger.dropAll(con);
                 }
                 for (DerivedDbTable table : derivedTables) {
                     if (height == 0) {

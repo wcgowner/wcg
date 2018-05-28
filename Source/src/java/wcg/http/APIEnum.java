@@ -65,6 +65,7 @@ public enum APIEnum {
     GET_ACCOUNT_ID("getAccountId", GetAccountId.instance),
     GET_ACCOUNT_LEDGER("getAccountLedger", GetAccountLedger.instance),
     GET_ACCOUNT_LEDGER_ENTRY("getAccountLedgerEntry", GetAccountLedgerEntry.instance),
+		GET_ACCOUNT_INTEREST("getAccountInterest", GetAccountInterest.instance),
     GET_VOTER_PHASED_TRANSACTIONS("getVoterPhasedTransactions", GetVoterPhasedTransactions.instance),
     GET_LINKED_PHASED_TRANSACTIONS("getLinkedPhasedTransactions", GetLinkedPhasedTransactions.instance),
     GET_POLLS("getPolls", GetPolls.instance),

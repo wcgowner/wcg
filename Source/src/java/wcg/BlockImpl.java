@@ -338,13 +338,13 @@ final class BlockImpl implements Block {
         return hasValidSignature;
     }
 
-    boolean verifyGenerationSignature() throws BlockchainProcessor.BlockOutOfOrderException {
+    boolean verifyGenerationSignature() throws BlockchainProcessor.BlockNotAcceptedException {
 
         try {
 
             BlockImpl previousBlock = BlockchainImpl.getInstance().getBlock(getPreviousBlockId());
             if (previousBlock == null) {
-                throw new BlockchainProcessor.BlockOutOfOrderException("Can't verify signature because previous block is missing", this);
+                throw new BlockchainProcessor.BlockNotAcceptedException("Can't verify signature because previous block is missing", this);
             }
 
             if (version == 1 && !Crypto.verify(generationSignature, previousBlock.generationSignature, getGeneratorPublicKey(), false)) {
