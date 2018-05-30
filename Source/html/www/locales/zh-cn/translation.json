@@ -1656,5 +1656,11 @@
   "false": "假",
   "true": "真",
   "compressed": "压缩",
-  "asset_exchange": "资产交换"
+  "asset_exchange": "资产交换",
+  "account_interests":"账户-利息",
+  "account_rs":"账号",
+  "payment height":"利息付出区块高度",
+  "period begin":"区块开始高度",
+  "period end":"区块完结高度",
+  "interest correction":"纠正的利息"
 }

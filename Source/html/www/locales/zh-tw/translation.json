@@ -1608,5 +1608,11 @@
   "unconfirmed_transactions_counter":"未確認的交易數目",
   "current_blockchain_height":"目前區塊鏈高度",
   "server_connection_status":"服務器連接狀態",
-  "cumulative_difficulty":"累計難度"
+  "cumulative_difficulty":"累計難度",
+  "account_interests":"賬戶-利息",
+  "account_rs":"賬号",
+  "payment height":"利息付出區塊高度",
+  "period begin":"區塊開始高度",
+  "period end":"區塊完結高度",
+  "interest correction":"糾正的利息"
 }

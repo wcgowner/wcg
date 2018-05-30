@@ -361,7 +361,7 @@ var NRS = (function(NRS, $, undefined) {
             'subTypes': {
                 0: {
                     'title': "Interest payment",
-                    'i18nKeyTitle': 'interest_payment',
+                    'i18nKeyTitle': 'interest_payment2',
                     'iconHTML': '<i class="fa fa-money"></i>'
                 }
             }
