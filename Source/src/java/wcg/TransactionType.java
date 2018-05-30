@@ -3281,14 +3281,14 @@ public abstract class TransactionType {
 					}
 					
 					if (attachment.getAmount() <= 0) {
-						throw new WcgException.NotValidException("Invalid interest payment amount " + attachment.getJSONObject());
+						throw new WcgException.NotCurrentlyValidException("Invalid interest payment amount " + attachment.getJSONObject());
 					}
 					
 					try {
 						if (Wcg.getBlockchain().getHeight()!=276493) {
 							if (InterestManager.VerifyPayment(attachment.getHeight())) {
 								Logger.logInfoMessage("double interest payment "+attachment.getHeight());
-								throw new WcgException.NotValidException("Interest payment already paid");
+								throw new WcgException.ExistingTransactionException("Interest payment already paid");
 							}
 						}
 
@@ -3431,14 +3431,14 @@ public abstract class TransactionType {
 					}
 					
 					if (attachment.getAmount() <= 0) {
-						throw new WcgException.NotValidException("Invalid interest payment amount " + attachment.getJSONObject());
+						throw new WcgException.NotCurrentlyValidException("Invalid interest payment amount " + attachment.getJSONObject());
 					}
 					
 					try {
 						if (attachment.getHeight()!=276480) {
 							if (InterestManager.VerifyPayment(attachment.getHeight())) {
 								Logger.logInfoMessage("double interest payment "+attachment.getHeight());
-								throw new WcgException.NotValidException("Interest payment already paid");
+								throw new WcgException.ExistingTransactionException("Interest payment already paid");
 							}
 						}
 
