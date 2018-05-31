@@ -1871,5 +1871,7 @@
   "interest": "Interest",
   "false": "False",
   "true": "True",
-  "active_forgers": "Active forgers"
+  "active_forgers": "Active forgers",
+  "interest_payment2":"Interest payment",
+  "interest_payment_correction":"Interest correction"
 }

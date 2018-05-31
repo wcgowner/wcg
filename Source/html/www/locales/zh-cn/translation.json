@@ -1662,5 +1662,7 @@
   "payment height":"利息付出区块高度",
   "period begin":"区块开始高度",
   "period end":"区块完结高度",
-  "interest correction":"纠正的利息"
+  "interest correction":"纠正的利息",
+  "interest_payment2":"派出利息",
+  "interest_payment_correction":"纠正利息"
 }
