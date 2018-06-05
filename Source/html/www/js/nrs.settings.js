@@ -24,7 +24,7 @@ var NRS = (function(NRS, $) {
 		"asset_exchange": true,
 		"send_token" : true,
 		"monetary_system": false,
-		"polls": false,
+		"polls": true,
 		"data_cloud": false,
 		"marketplace": false,
 		"shuffling": false,
