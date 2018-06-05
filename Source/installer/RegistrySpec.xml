@@ -26,7 +26,7 @@
         <value name="HelpLink"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
-               string="http://forum.r6s6.com/"/>
+               string="http://www.worldcryptocap.org/"/>
         <value name="URLInfoAbout"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
