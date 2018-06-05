@@ -28,7 +28,7 @@ in such a way that no trusted third parties are required anymore.
   - Window: `run.bat`
 
   - wait for the JavaFX wallet window to open
-  - on platforms without JavaFX, open http://localhost:27876/ in a browser
+  - on platforms without JavaFX, open http://localhost:2082/ in a browser
 
 ----
 ## Compile it! ##

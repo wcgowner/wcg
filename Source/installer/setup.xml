@@ -6,7 +6,7 @@
     <info>
         <appname>WCG</appname>
         <appversion>@{runtime.wcg.version}</appversion>
-        <url>https://wcg.org</url>
+        <url>http://www.worldcryptocap.org</url>
         <run-privileged condition="izpack.windowsinstall"/>
     </info>
 

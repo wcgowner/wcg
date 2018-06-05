@@ -22,7 +22,7 @@
         <value name="DisplayIcon"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
-               string="$INSTALL_PATH\html\ui\favicon.ico"/>
+               string="$INSTALL_PATH\html\www\favicon.ico"/>
         <value name="HelpLink"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
@@ -34,7 +34,7 @@
        <value name="Publisher"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
-               string="wcg.org"/>
+               string="www.worldcryptocap.org"/>
        <value name="Version"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"

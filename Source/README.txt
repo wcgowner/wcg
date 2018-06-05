@@ -30,7 +30,7 @@ supported.
 The initialization takes a few seconds. When it is ready, you should see the
 message "Nxt server 1.x.x started successfully" in the console log. If run in
 desktop mode, a JavaFX window will open automatically. Otherwise, open a
-browser, without stopping the java process, and go to http://localhost:27876 ,
+browser, without stopping the java process, and go to http://localhost:2082 ,
 where the Nxt UI should now be available.
 
 To stop the application, type Ctrl-C inside the console window, or use the
@@ -106,17 +106,17 @@ which you see in the console window, but also to a file nxt.log, which gets
 overwritten at restart. In case of an error, the nxt.log file may contain
 helpful information, so include its contents when submitting a bug report.
 
-In addition to the default user interface at http://localhost:27876 , the
+In addition to the default user interface at http://localhost:2082 , the
 following urls are available:
 
-http://localhost:27876/test - a list of all available http API requests, very
+http://localhost:2082/test - a list of all available http API requests, very
 useful for client developers and for anyone who wants to execute commands
 directly using the http interface without going through the browser UI.
 
-http://localhost:27876/test?requestType=<specificRequestType> - same as above,
+http://localhost:2082/test?requestType=<specificRequestType> - same as above,
 but only shows the form for the request type specified.
 
-http://localhost:27876/doc - a javadoc documentation for client developers who
+http://localhost:2082/doc - a javadoc documentation for client developers who
 want to use the Java API directly instead of going through the http interface.
 
 
