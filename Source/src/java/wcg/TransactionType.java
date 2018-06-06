@@ -3285,7 +3285,7 @@ public abstract class TransactionType {
 					}
 					
 					try {
-						if (Wcg.getBlockchain().getHeight()!=276493) {
+						if (Wcg.getBlockchain().getHeight()!=276492) {
 							if (InterestManager.VerifyPayment(attachment.getHeight())) {
 								Logger.logInfoMessage("double interest payment "+attachment.getHeight());
 								throw new WcgException.ExistingTransactionException("Interest payment already paid");
@@ -3435,12 +3435,9 @@ public abstract class TransactionType {
 					}
 					
 					try {
-						if (attachment.getHeight()!=276480) {
 							if (InterestManager.VerifyPayment(attachment.getHeight())) {
-								Logger.logInfoMessage("double interest payment "+attachment.getHeight());
 								throw new WcgException.ExistingTransactionException("Interest payment already paid");
 							}
-						}
 
 						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
 						
