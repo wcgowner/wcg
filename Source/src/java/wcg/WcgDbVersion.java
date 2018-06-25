@@ -1228,7 +1228,13 @@ class WcgDbVersion extends DbVersion {
 						case 509:
 								apply("ALTER TABLE interest_account ADD COLUMN IF NOT EXISTS check_height INT DEFAULT 0");
 						case 510:
-								return;
+								apply("ALTER TABLE interest_account DROP PRIMARY KEY");
+						case 511:	
+								apply("ALTER TABLE interest_account ADD CONSTRAINT PK_INTEREST_ACCOUNT PRIMARY KEY (\"ACCOUNT_ID\", \"BEGIN\", \"TYPE\")");
+						case 512:
+								apply("ALTER TABLE interest_account DROP COLUMN IF EXISTS payment_number");
+						case 513:
+							return;
 						default:
 								throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
         }

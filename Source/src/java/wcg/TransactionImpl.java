@@ -997,18 +997,6 @@ final class TransactionImpl implements Transaction {
             }
         }
         
-        // #leopard#
-        // mono payer version : no check on generator
-        if (type.getType()==TransactionType.TYPE_INTEREST) {
-          // verify interest conditions
-          
-          // get recipient interest account record
-          
-          // calculate average balance of the period
-          //this.amountNQT;
-          this.getRecipientId();
-        }
-
         boolean validatingAtFinish = phasing != null && getSignature() != null && PhasingPoll.getPoll(getId()) != null;
         for (Appendix.AbstractAppendix appendage : appendages) {
             appendage.loadPrunable(this);

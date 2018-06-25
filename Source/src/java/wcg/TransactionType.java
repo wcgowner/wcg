@@ -3244,7 +3244,7 @@ public abstract class TransactionType {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment)transaction.getAttachment();
 
 					try {
-						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
+						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getPaymentId());
 
 						for (int index=0; index<accounts.size(); index++) {
 							InterestManager.AccountRecord account = accounts.get(index);
@@ -3255,9 +3255,10 @@ public abstract class TransactionType {
 								Account.getAccount(account.account_id).addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT, transaction.getId(), interest.longValue());
 							}
 						}
+						
 						InterestManager.GetPayerAccount().addToBalanceNQT(LedgerEvent.INTEREST_PAYMENT, transaction.getId(), -attachment.getAmount());
 
-						InterestManager.UpdatePaymentTransaction(attachment.getHeight(), transaction.getId(), transaction.getHeight());
+						InterestManager.UpdatePaymentTransaction(transaction.getId(), transaction.getHeight(), attachment.getPaymentId());
 					}
 					catch (Exception e) {
 						Logger.logInfoMessage("Exception " + e);
@@ -3287,12 +3288,11 @@ public abstract class TransactionType {
 					try {
 						if (Wcg.getBlockchain().getHeight()!=276492) {
 							if (InterestManager.VerifyPayment(attachment.getHeight())) {
-								Logger.logInfoMessage("double interest payment "+attachment.getHeight());
 								throw new WcgException.ExistingTransactionException("Interest payment already paid");
 							}
 						}
 
-						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
+						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getPaymentId());
 						
 						if (accounts.size()!=attachment.getNumberAccounts()) {
 							throw new WcgException.NotCurrentlyValidException("Invalid interest payment accounts number");
@@ -3317,7 +3317,7 @@ public abstract class TransactionType {
 						throw new WcgException.NotCurrentlyValidException("Exception " + e);
 					}
 				}
-
+				
 				@Override
 				boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String, Integer>> duplicates) {
 					Attachment.InterestPayment attachment = (Attachment.InterestPayment) transaction.getAttachment();
@@ -3394,7 +3394,7 @@ public abstract class TransactionType {
 					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2)transaction.getAttachment();
 
 					try {
-						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
+						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getPaymentId());
 
 						for (int index=0; index<accounts.size(); index++) {
 							InterestManager.AccountRecord account = accounts.get(index);
@@ -3405,9 +3405,10 @@ public abstract class TransactionType {
 								Account.getAccount(account.account_id).addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), interest.longValue());
 							}
 						}
+						
 						InterestManager.GetPayerAccount().addToBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), -attachment.getAmount());
 
-						InterestManager.UpdatePaymentTransaction(attachment.getHeight(), transaction.getId(), transaction.getHeight());
+						InterestManager.UpdatePaymentTransaction(transaction.getId(), transaction.getHeight(), attachment.getPaymentId());
 					}
 					catch (Exception e) {
 						Logger.logInfoMessage("Exception " + e);
@@ -3439,9 +3440,10 @@ public abstract class TransactionType {
 								throw new WcgException.ExistingTransactionException("Interest payment already paid");
 							}
 
-						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getHeight());
+						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getPaymentId());
 						
 						if (accounts.size()!=attachment.getNumberAccounts()) {
+							Logger.logInfoMessage("accounts "+accounts.size()+" att an "+attachment.getNumberAccounts());
 							throw new WcgException.NotCurrentlyValidException("Invalid interest payment accounts number");
 						}
 						

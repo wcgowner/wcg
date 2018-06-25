@@ -39,7 +39,7 @@ public final class GetBlock extends APIServlet.APIRequestHandler {
     @Override
     protected JSONStreamAware processRequest(HttpServletRequest req) {
 
-        Block blockData;
+				Block blockData;
         String blockValue = Convert.emptyToNull(req.getParameter("block"));
         String heightValue = Convert.emptyToNull(req.getParameter("height"));
         String timestampValue = Convert.emptyToNull(req.getParameter("timestamp"));

@@ -28,7 +28,6 @@ public class InterestManager {
 		public String   account_rs;
 		public long			account_id;
 		public int			payment_height;
-    public int			payment_number;
 		public int			begin;
     public int			end;
     public boolean	next;
@@ -138,20 +137,6 @@ public class InterestManager {
 		}
 	}
 	
-	public static boolean CalculateWrongInterests() throws SQLException {
-		try (PreparedStatement pstmt = connection.prepareStatement( "INSERT INTO interest_collect SELECT account_id, balance*0.03 FROM interest_account WHERE balance IS NOT NULL AND balance<=10000000000 ORDER BY account_id DESC")) {
-			//pstmt.executeQuery();
-			return true;
-		}
-	}
-	
-	public static boolean CollectWrongInterests() throws SQLException {
-		try (PreparedStatement pstmt = connection.prepareStatement( "INSERT INTO interest_collect SELECT account_id, balance*0.03 FROM interest_account WHERE balance IS NOT NULL AND balance<=10000000000 ORDER BY account_id DESC")) {
-			//pstmt.executeQuery();
-			return true;
-		}
-	}
-
 	public static boolean CorrectInterests(int height) throws SQLException {
 		try (PreparedStatement pstmtSelect = connection.prepareStatement("SELECT * FROM interest_account WHERE wrong_balance<>0 AND type=2 ORDER BY check_height, begin, account_id ASC LIMIT 100");) {
       try (ResultSet rs = pstmtSelect.executeQuery()) {
@@ -305,11 +290,11 @@ public class InterestManager {
 		}
 	}
 	
-	public static void DeleteAccount(long account_id, int payment_number) throws SQLException {
-    try (PreparedStatement pstmt = connection.prepareStatement( "DELETE FROM interest_account WHERE account_id=? AND payment_number=? AND type<>0")) {
+	public static void DeleteAccount(long account_id, int begin) throws SQLException {
+    try (PreparedStatement pstmt = connection.prepareStatement( "DELETE FROM interest_account WHERE account_id=? AND begin>=? AND type<>0")) {
       int i = 0;
       pstmt.setLong(++i, account_id);
-      pstmt.setInt(++i, payment_number);
+      pstmt.setInt(++i, begin);
       pstmt.executeUpdate();
     }
 		catch (SQLException e) {
@@ -317,11 +302,22 @@ public class InterestManager {
     }
   }
 	
-	public static void DeleteAccount2(long account_id, int payment_number) throws SQLException {
-    try (PreparedStatement pstmt = connection.prepareStatement( "DELETE FROM interest_account WHERE account_id=? AND payment_number=? AND type=0")) {
+	public static void DeleteAccount2(long account_id, int begin) throws SQLException {
+    try (PreparedStatement pstmt = connection.prepareStatement( "DELETE FROM interest_account WHERE account_id=? AND begin>=? AND type=0")) {
       int i = 0;
       pstmt.setLong(++i, account_id);
-      pstmt.setInt(++i, payment_number);
+      pstmt.setInt(++i, begin);
+      pstmt.executeUpdate();
+    }
+		catch (SQLException e) {
+      throw new RuntimeException(e.toString(), e);
+    }
+  }
+	
+	public static void DeleteAccountsAtHeight(int begin) throws SQLException {
+    try (PreparedStatement pstmt = connection.prepareStatement( "DELETE FROM interest_account WHERE begin>=?")) {
+      int i = 0;
+      pstmt.setInt(++i, begin);
       pstmt.executeUpdate();
     }
 		catch (SQLException e) {
@@ -330,7 +326,7 @@ public class InterestManager {
   }
 	
 	public static void DeleteBalancesAtHeight(int height) throws SQLException {
-    try (PreparedStatement pstmt = connection.prepareStatement( "DELETE FROM interest_balance WHERE height=?")) {
+    try (PreparedStatement pstmt = connection.prepareStatement( "DELETE FROM interest_balance WHERE height>=?")) {
       int i = 0;
       pstmt.setInt(++i, height);
       pstmt.executeUpdate();
@@ -359,6 +355,26 @@ public class InterestManager {
     }
   }
 	
+	public static void DeletePaymentsAtHeight(int height) throws SQLException {
+    try (PreparedStatement pstmt = connection.prepareStatement( "DELETE FROM interest_payment WHERE height>=?")) {
+      int i = 0;
+      pstmt.setInt(++i, height);
+      pstmt.executeUpdate();
+    }
+		catch (SQLException e) {
+      throw new RuntimeException(e.toString(), e);
+    }
+		
+		try (PreparedStatement pstmt = connection.prepareStatement( "UPDATE interest_account SET payment_id=NULL, payment_height=NULL WHERE payment_height>=?")) {
+      int i = 0;
+      pstmt.setInt(++i, height);
+      pstmt.executeUpdate();
+    }
+		catch (SQLException e) {
+      throw new RuntimeException(e.toString(), e);
+    }
+  }
+	
 	public static AccountRecord GetAccountRecord(long account_id, int height) throws SQLException {
     try (PreparedStatement pstmtSelect = connection.prepareStatement("SELECT * FROM interest_account WHERE account_id=? AND begin<=? AND end>=? AND type<>0");) {
       pstmtSelect.setLong(1, account_id);
@@ -368,7 +384,7 @@ public class InterestManager {
       try (ResultSet rs = pstmtSelect.executeQuery()) {
         if (rs.next()) {
           AccountRecord account = new AccountRecord();
-          account.payment_number = rs.getInt("payment_number");
+					account.begin = rs.getInt("begin");
           account.end = rs.getInt("end");
           account.next = rs.getBoolean("next");
           
@@ -388,7 +404,7 @@ public class InterestManager {
       try (ResultSet rs = pstmtSelect.executeQuery()) {
         if (rs.next()) {
           AccountRecord account = new AccountRecord();
-          account.payment_number = rs.getInt("payment_number");
+					account.begin = rs.getInt("begin");
           account.end = rs.getInt("end");
           account.next = rs.getBoolean("next");
           
@@ -399,9 +415,9 @@ public class InterestManager {
     }
   }
 	
-	public static List<AccountRecord> GetAccounts(int paymentHeight) throws SQLException {
-    try (PreparedStatement pstmtSelect = connection.prepareStatement("SELECT account_id, balance FROM interest_account WHERE payment_height=?");) {
-      pstmtSelect.setInt(1, paymentHeight);
+	public static List<AccountRecord> GetAccounts(int paymentId) throws SQLException {
+    try (PreparedStatement pstmtSelect = connection.prepareStatement("SELECT account_id, balance FROM interest_account WHERE payment_id=?");) {
+      pstmtSelect.setInt(1, paymentId);
 
        try (ResultSet rs = pstmtSelect.executeQuery()) {
         List<AccountRecord> accounts = new ArrayList<>();
@@ -439,15 +455,15 @@ public class InterestManager {
   public static String GetForgerSecretPhrase() {
     return forgerSecretPhrase;
   }
-  
+	
 	public static AccountRecord GetLastAccountRecord(long account_id) throws SQLException {
-    try (PreparedStatement pstmtSelect = connection.prepareStatement("SELECT * FROM interest_account WHERE account_id=? AND type<>0 ORDER BY payment_number DESC LIMIT 1");) {
+    try (PreparedStatement pstmtSelect = connection.prepareStatement("SELECT * FROM interest_account WHERE account_id=? AND type<>0 ORDER BY begin DESC LIMIT 1");) {
       pstmtSelect.setLong(1, account_id);
 
       try (ResultSet rs = pstmtSelect.executeQuery()) {
         if (rs.next()) {
           AccountRecord account = new AccountRecord();
-          account.payment_number = rs.getInt("payment_number");
+					account.begin = rs.getInt("begin");
           account.end = rs.getInt("end");
           account.next = rs.getBoolean("next");
           
@@ -459,13 +475,13 @@ public class InterestManager {
   }
 
 	public static AccountRecord GetLastAccountRecord2(long account_id) throws SQLException {
-    try (PreparedStatement pstmtSelect = connection.prepareStatement("SELECT * FROM interest_account WHERE account_id=? AND type<>2 ORDER BY payment_number DESC LIMIT 1");) {
+    try (PreparedStatement pstmtSelect = connection.prepareStatement("SELECT * FROM interest_account WHERE account_id=? AND type<>2 ORDER BY begin DESC LIMIT 1");) {
       pstmtSelect.setLong(1, account_id);
 
       try (ResultSet rs = pstmtSelect.executeQuery()) {
         if (rs.next()) {
           AccountRecord account = new AccountRecord();
-          account.payment_number = rs.getInt("payment_number");
+					account.begin = rs.getInt("begin");
           account.end = rs.getInt("end");
           account.next = rs.getBoolean("next");
           
@@ -533,7 +549,6 @@ public class InterestManager {
 						
 						account.account_rs = Convert.rsAccount(rs.getLong("account_id"));
 						account.payment_height = rs.getInt("payment_height");
-						account.payment_number = rs.getInt("payment_number");
 						account.begin = rs.getInt("begin");
 						account.end = rs.getInt("end");
 						account.next = rs.getBoolean("next");
@@ -565,7 +580,6 @@ public class InterestManager {
 						AccountRecord account = new AccountRecord();
 
 						account.payment_height = rs.getInt("payment_height");
-						account.payment_number = rs.getInt("payment_number");
 						account.begin = rs.getInt("begin");
 						account.end = rs.getInt("end");
 						account.next = rs.getBoolean("next");
@@ -763,8 +777,10 @@ public class InterestManager {
 		
 		Wcg.getBlockchainProcessor().addListener(block -> {
 			try {
-				InterestManager.ResetPaymentTransaction(block.getHeight());
 				InterestManager.DeleteBalancesAtHeight(block.getHeight());
+				InterestManager.DeleteAccountsAtHeight(block.getHeight());
+				InterestManager.DeletePaymentsAtHeight(block.getHeight());
+				InterestManager.ResetPaymentTransaction(block.getHeight());
 			}
 			catch (SQLException e) {
 				Logger.logInfoMessage("exception " + e);
@@ -804,14 +820,13 @@ public class InterestManager {
     }
   }
   
-	public static void InsertAccount(long account_id, int payment_number, int begin, int end, long firstBalance, int type) throws SQLException {
+	public static void InsertAccount(long account_id, int begin, int end, long firstBalance, int type) throws SQLException {
     try (PreparedStatement pstmt = connection.prepareStatement( "INSERT INTO interest_account" +
-                                                                "  (account_id, payment_number, begin, end, first_balance, type)" +
+                                                                "  (account_id, begin, end, first_balance, type)" +
                                                                 " VALUES" +
-                                                                " (?, ?, ?, ?, ?, ?)")) {
+                                                                " (?, ?, ?, ?, ?)")) {
       int i = 0;
       pstmt.setLong(++i, account_id);  
-      pstmt.setInt(++i, payment_number);
       pstmt.setInt(++i, begin);
       pstmt.setInt(++i, end);
 			pstmt.setLong(++i, firstBalance);
@@ -888,34 +903,35 @@ public class InterestManager {
     }
   }
 	
-  public static void SetAccountNext(long account_id, int payment_number, boolean next) throws SQLException {
+  public static void SetAccountNext(long account_id, int begin, boolean next) throws SQLException {
      try (PreparedStatement pstmt = connection.prepareStatement( "UPDATE interest_account SET next=?" +
-                                                                "  WHERE account_id=? AND payment_number=? AND type<>0")) {
+                                                                "  WHERE account_id=? AND begin=? AND type<>0")) {
       int i = 0;
       pstmt.setBoolean(++i, next);
       pstmt.setLong(++i, account_id);
-      pstmt.setInt(++i, payment_number);
+      pstmt.setInt(++i, begin);
       pstmt.executeUpdate();
     }
   }
 	
-	public static void SetAccountType(long account_id, int type) throws SQLException {
+	public static void SetAccountType(long account_id, int begin, int type) throws SQLException {
      try (PreparedStatement pstmt = connection.prepareStatement( "UPDATE interest_account SET type=?" +
-                                                                "  WHERE account_id=? AND payment_number=1 AND type<>0")) {
+                                                                "  WHERE account_id=? AND begin=? AND type<>0")) {
       int i = 0;
       pstmt.setInt(++i, type);
       pstmt.setLong(++i, account_id);
+			pstmt.setInt(++i, begin);
       pstmt.executeUpdate();
     }
   }
 	
-	public static void SetAccountNext2(long account_id, int payment_number, boolean next) throws SQLException {
+	public static void SetAccountNext2(long account_id, int begin, boolean next) throws SQLException {
      try (PreparedStatement pstmt = connection.prepareStatement( "UPDATE interest_account SET next=?" +
-                                                                "  WHERE account_id=? AND payment_number=? AND type=0")) {
+                                                                "  WHERE account_id=? AND begin=? AND type=0")) {
       int i = 0;
       pstmt.setBoolean(++i, next);
       pstmt.setLong(++i, account_id);
-      pstmt.setInt(++i, payment_number);
+      pstmt.setInt(++i, begin);
       pstmt.executeUpdate();
     }
   }
@@ -950,15 +966,14 @@ public class InterestManager {
 		}		
 	}
 	
-	public static void UpdatePaymentTransaction(int paymentHeight, long transactionId, int transactionHeight)  throws SQLException {
-		try (PreparedStatement pstmt = connection.prepareStatement( "UPDATE interest_payment SET transaction_id=?, transaction_height=?" +
-																																		"  WHERE height=?")) {
+	public static void UpdatePaymentTransaction(long transactionId, int transactionHeight, int paymentId)  throws SQLException {
+		try (PreparedStatement pstmt = connection.prepareStatement( "UPDATE interest_payment SET transaction_id=?, transaction_height=? WHERE id=?")) {
 			int i = 0;
 			pstmt.setLong(++i, transactionId);
 			pstmt.setInt(++i, transactionHeight);
-			pstmt.setInt(++i, paymentHeight);
+			pstmt.setInt(++i, paymentId);
 			pstmt.executeUpdate();
-		}		
+		}
 	}
 	
   public static void UpdateTableAccount(int height) throws SQLException {
@@ -967,7 +982,6 @@ public class InterestManager {
       pstmtSelect.setInt(1, height);
 
       try (ResultSet rs = pstmtSelect.executeQuery()) {
-        int payment_number;
         int begin;
         int end;
         int isInPeriod;
@@ -994,7 +1008,6 @@ public class InterestManager {
 
               // if no record
               if (account==null) {
-                payment_number = 1;
                 begin = height;
                 end = height + InterestManager.period;
 								firstBalance = rs.getLong("balance");
@@ -1008,11 +1021,11 @@ public class InterestManager {
 								accountType = 2;
 							}
 							
-              InterestManager.InsertAccount(rs.getLong("account_id"), payment_number, begin, end, firstBalance, accountType);
+              InterestManager.InsertAccount(rs.getLong("account_id"), begin, end, firstBalance, accountType);
             }
 						else {
 							if (rs.getLong("balance")<=100*Constants.ONE_WCG) {
-								InterestManager.SetAccountType(rs.getLong("account_id"), 2);
+								InterestManager.SetAccountType(rs.getLong("account_id"), isInPeriod, 2);
 							}
 						}
           }
@@ -1027,22 +1040,21 @@ public class InterestManager {
 
               if (account!=null) {
                 // set next to 0
-                InterestManager.SetAccountNext(rs.getLong("account_id"), account.payment_number, false);
+                InterestManager.SetAccountNext(rs.getLong("account_id"), account.begin, false);
               }
             }
             // in period
             else {
               account = InterestManager.GetAccountRecord(rs.getLong("account_id"), height);
               
-              // delete record with payment_number =
-              InterestManager.DeleteAccount(rs.getLong("account_id"), account.payment_number);
+							InterestManager.DeleteAccount(rs.getLong("account_id"), account.begin);
 
               account = InterestManager.GetLastAccountRecord(rs.getLong("account_id"));
 
               // update next
               if (account!=null) {
                 // set next to 0
-                InterestManager.SetAccountNext(rs.getLong("account_id"), account.payment_number, false);
+                InterestManager.SetAccountNext(rs.getLong("account_id"), account.begin, false);
               }
             }
           }
@@ -1058,7 +1070,6 @@ public class InterestManager {
       pstmtSelect.setInt(1, height);
 
       try (ResultSet rs = pstmtSelect.executeQuery()) {
-        int payment_number;
         int begin;
         int end;
         int isInPeriod;
@@ -1082,14 +1093,11 @@ public class InterestManager {
 
               // if no record
               if (account==null) {
-                payment_number = 1;
                 begin = height;
                 end = height + InterestManager.period;
 								firstBalance = rs.getLong("balance");
               }
               else {
-                payment_number = account.payment_number + 1;
-
                 if (account.next) {
                   begin = account.end;
                   end = begin + InterestManager.period;
@@ -1102,7 +1110,7 @@ public class InterestManager {
 								firstBalance = InterestManager.GetBalanceAtHeight(rs.getLong("account_id"), begin);
               }
 
-              InterestManager.InsertAccount(rs.getLong("account_id"), payment_number, begin, end, firstBalance, 0);
+              InterestManager.InsertAccount(rs.getLong("account_id"), begin, end, firstBalance, 0);
             }
           }
 
@@ -1116,23 +1124,21 @@ public class InterestManager {
 
               if (account!=null) {
                 // set next to 0
-                InterestManager.SetAccountNext2(rs.getLong("account_id"), account.payment_number, false);
+                InterestManager.SetAccountNext2(rs.getLong("account_id"), account.begin, false);
               }
             }
             // in period
             else {
               account = InterestManager.GetAccountRecord2(rs.getLong("account_id"), height);
               
-              // delete record with payment_number =
-							
-              InterestManager.DeleteAccount2(rs.getLong("account_id"), account.payment_number);
+							InterestManager.DeleteAccount2(rs.getLong("account_id"), account.begin);
 
               account = InterestManager.GetLastAccountRecord2(rs.getLong("account_id"));
 
               // update next
               if (account!=null) {
                 // set next to 0
-                InterestManager.SetAccountNext2(rs.getLong("account_id"), account.payment_number, false);
+                InterestManager.SetAccountNext2(rs.getLong("account_id"), account.begin, false);
               }
             }
           }
@@ -1150,9 +1156,10 @@ public class InterestManager {
         if (rs.next()) {
           return true;
         }
+		
         return false;
       }
-		}		
+		}
 	}
 
 }
