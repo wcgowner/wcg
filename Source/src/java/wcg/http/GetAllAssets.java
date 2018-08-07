@@ -44,7 +44,10 @@ public final class GetAllAssets extends APIServlet.APIRequestHandler {
         response.put("assets", assetsJSONArray);
         try (DbIterator<Asset> assets = Asset.getAllAssets(firstIndex, lastIndex)) {
             while (assets.hasNext()) {
-                assetsJSONArray.add(JSONData.asset(assets.next(), includeCounts));
+								Asset asset = assets.next();
+								if (!Long.toUnsignedString(asset.getId()).equals("11164589766816208741")) {
+									assetsJSONArray.add(JSONData.asset(asset, includeCounts));
+								}
             }
         }
         return response;

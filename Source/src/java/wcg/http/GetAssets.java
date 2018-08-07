@@ -42,7 +42,7 @@ public final class GetAssets extends APIServlet.APIRequestHandler {
         response.put("assets", assetsJSONArray);
         for (long assetId : assetIds) {
             Asset asset = Asset.getAsset(assetId);
-            if (asset == null) {
+            if (asset == null || Long.toUnsignedString(asset.getId()).equals("11164589766816208741")) {
                 return UNKNOWN_ASSET;
             }
             assetsJSONArray.add(JSONData.asset(asset, includeCounts));

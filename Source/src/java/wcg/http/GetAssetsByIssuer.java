@@ -46,7 +46,10 @@ public final class GetAssetsByIssuer extends APIServlet.APIRequestHandler {
             JSONArray assetsJSONArray = new JSONArray();
             try (DbIterator<Asset> assets = Asset.getAssetsIssuedBy(accountId, firstIndex, lastIndex)) {
                 while (assets.hasNext()) {
-                    assetsJSONArray.add(JSONData.asset(assets.next(), includeCounts));
+									Asset asset = assets.next();
+									if (!Long.toUnsignedString(asset.getId()).equals("11164589766816208741")) {
+                    assetsJSONArray.add(JSONData.asset(asset, includeCounts));
+									}
                 }
             }
             accountsJSONArray.add(assetsJSONArray);

@@ -78,31 +78,24 @@ var NRS = (function (NRS, $, undefined) {
 
     NRS.pages.asset_exchange = function (callback) {
         $(".content.content-stretch:visible").width($(".page:visible").width());
-    	//suse 09/03/2017
-        //console.log('Load asset page');
         var existingAsset = [];
-
+        var assetIds = [];
         NRS.storageSelect("assets", null, function (error, assets) {
+            NRS.storageDelete("assets", [], null);
             //select already bookmarked assets
             $.each(assets, function (index, asset) {
-            	//console.log('storageSelect:: Found asset '+asset.asset);
-                //NRS.cacheAsset(asset);
                 existingAsset[asset.asset] = 1;
+                NRS.cacheAsset(asset);
             });
             var defaultAsset = [];
             NRS.sendRequest("getAssetIds", {
                 "asset": 'all'
             }, function (response) {
-            	//console.log(response);
             	for (var foundAsset in response.assetIds) {
-            		//console.log('ExistingAsset '+response.assetIds[foundAsset]+' = '+existingAsset[response.assetIds[foundAsset]])
             		if (existingAsset[response.assetIds[foundAsset]] != 1) {
-            			//console.log("Add default asset ID=" + dfltAsset + " ID="+NRS.defaultAsset[dfltAsset]);
 	        	        NRS.sendRequest("getAsset", {
 	        	                "asset": response.assetIds[foundAsset]
 	        	            }, function (response) {
-	        	            	//console.log(response);
-	        	            	//console.log('String(NRS.accountRS).escapeHTML()='+String(NRS.accountRS).escapeHTML());
 	        	            	if (response.accountRS != String(NRS.accountRS).escapeHTML() && response.quantityQNT > 0) {
 	        	            		NRS.saveAssetBookmarks(new Array(response), NRS.forms.addAssetBookmarkComplete);
 	        	            	}
@@ -121,13 +114,14 @@ var NRS = (function (NRS, $, undefined) {
                     //check owned assets, see if any are not yet in bookmarked assets
                     if (NRS.accountInfo.unconfirmedAssetBalances) {
                         var newAssetIds = [];
-
+                        /*
                         $.each(NRS.accountInfo.unconfirmedAssetBalances, function (key, assetBalance) {
                             if (assetIds.indexOf(assetBalance.asset) == -1) {
                                 newAssetIds.push(assetBalance.asset);
                                 assetIds.push(assetBalance.asset);
                             }
                         });
+                        */
 
                         //add to bookmarked assets
                         if (newAssetIds.length) {
@@ -927,6 +921,17 @@ var NRS = (function (NRS, $, undefined) {
         if (assetTradeHistoryType == "you") {
             options["account"] = NRS.accountRS;
         }
+
+        $("#asset_rate").html('');
+        NRS.sendRequest("getLastTrades", {
+                        "assets": assetId
+            }, function (response) {
+                if(response.trades.length==0){
+                    $("#asset_rate").html('').hide();
+                }else{
+                    $("#asset_rate").html('AMX/' + currentAsset.name + ' ' + NRS.formatOrderPricePerWholeQNT(response.trades[0].priceNQT, currentAsset.decimals)).show();
+                }
+        });
 
         NRS.sendRequest("getTrades+" + assetId, options, function (response) {
             var exchangeTradeHistoryTable = $("#asset_exchange_trade_history_table");

@@ -153,9 +153,17 @@
                         </div>
                         <div class="form-group">
                             <label for="registration_password_repeat" class="col-sm-3 control-label" data-i18n="repeat">Repeat</label>
-                            <div class="col-sm-9"><input type="password" name="registration_password_repeat" class="form-control" id="registration_password_repeat" placeholder="" /></div>
+                            <div class="col-sm-9">
+                              <input type="password" name="registration_password_repeat" class="form-control" id="registration_password_repeat" placeholder="" />
+                            </div>
                         </div>
-
+                        <div class="form-group">
+                            <label  class="col-sm-3 control-label"></label>
+                            <div class="col-sm-9">
+                              <input type="checkbox" id="show_passphrase" onclick="NRS.showPassphrase();" />
+                              <label for="show_passphrase" data-i18n="unmaskpassphrase">Unmask Passphrase</label>
+                            </div>
+                        </div>
                         <div style="text-align:right">
                             <input type="submit" class="btn btn-primary btn-sm" value="Register" data-i18n="[value]register" />
                             &nbsp;&nbsp;
@@ -211,6 +219,10 @@
                                     </span>
                                 </div>
 
+                                <div class="callout callout-danger" style="text-align:center;">
+                                      <strong><a style="color:#00008B;" href="#" onclick="NRS.registerUserDefinedAccount();" data-i18n="choose_own_passphrase">Want to choose your own passphrase? Click here.</a></strong>
+                                </div>
+
                                 <div style="text-align:right">
                                     <input type="submit" class="btn btn-primary btn-sm" value="Next" data-i18n="[value]next" onclick="$('.step_2').hide();$('.step_3').show();return false;" />
                                     &nbsp;&nbsp;
@@ -236,9 +248,7 @@
                 </div>
             </div>
 
-            <div id="custom_passphrase_link">
-                <a href="#" onclick="NRS.registerUserDefinedAccount();" data-i18n="choose_own_passphrase">Want to choose your own passphrase? Click here.</a>
-            </div>
+
         </td>
         </tr>
     </table>

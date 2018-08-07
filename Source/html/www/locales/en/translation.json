@@ -764,6 +764,7 @@
   "parse_transaction": "Parse Transaction",
   "parse_transaction_bytes": "Parse Transaction Bytes",
   "passphrase": "Passphrase",
+  "unmaskpassphrase":"Unmask Passphrase",
   "passphrase_length_warning": "Your passphrase must be at least 35 characters long.",
   "passphrase_remote_warning": "Your passphrase will be sent to the server!",
   "passphrase_required_for_decryption": "Your passphrase is required to decrypt these messages.",

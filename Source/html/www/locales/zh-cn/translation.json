@@ -765,6 +765,7 @@
   "parse_transaction":"解析交易",
   "parse_transaction_bytes":"解析交易字节",
   "passphrase":"密码",
+  "unmaskpassphrase":"显示密码",
   "passphrase_length_warning":"您的密码长度必须至少为 35 个字符。",
   "passphrase_remote_warning":"您的密码将发送到服务器 ！",
   "passphrase_required_for_decryption":"需要您的密码来解密这些信息。",

@@ -73,6 +73,19 @@ var NRS = (function(NRS, $, undefined) {
 		$("#registration_password").focus();
 	};
 
+	NRS.showPassphrase = function() {
+		var checkBox = document.getElementById("show_passphrase");
+		if (checkBox.checked == true){
+			alert("Yes");
+      $("#registration_password").prop('type', 'text');
+			$("#registration_password_repeat").prop('type', 'text');
+    } else {
+			alert("Yes");
+       $("#registration_password").prop('type', 'password');
+			 $("#registration_password_repeat").prop('type', 'password');
+    }
+	};
+
 	NRS.registerAccount = function() {
 		$("#login_panel, #welcome_panel").hide();
 		var accountPhraseGeneratorPanel = $("#account_phrase_generator_panel");
