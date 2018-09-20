@@ -98,14 +98,16 @@ public final class GetAccount extends APIServlet.APIRequestHandler {
                 JSONArray unconfirmedAssetBalances = new JSONArray();
                 while (accountAssets.hasNext()) {
                     Account.AccountAsset accountAsset = accountAssets.next();
-                    JSONObject assetBalance = new JSONObject();
-                    assetBalance.put("asset", Long.toUnsignedString(accountAsset.getAssetId()));
-                    assetBalance.put("balanceQNT", String.valueOf(accountAsset.getQuantityQNT()));
-                    assetBalances.add(assetBalance);
-                    JSONObject unconfirmedAssetBalance = new JSONObject();
-                    unconfirmedAssetBalance.put("asset", Long.toUnsignedString(accountAsset.getAssetId()));
-                    unconfirmedAssetBalance.put("unconfirmedBalanceQNT", String.valueOf(accountAsset.getUnconfirmedQuantityQNT()));
-                    unconfirmedAssetBalances.add(unconfirmedAssetBalance);
+                    if (!Long.toUnsignedString(accountAsset.getAssetId()).equals("11164589766816208741")) {
+                        JSONObject assetBalance = new JSONObject();
+                        assetBalance.put("asset", Long.toUnsignedString(accountAsset.getAssetId()));
+                        assetBalance.put("balanceQNT", String.valueOf(accountAsset.getQuantityQNT()));
+                        assetBalances.add(assetBalance);
+                        JSONObject unconfirmedAssetBalance = new JSONObject();
+                        unconfirmedAssetBalance.put("asset", Long.toUnsignedString(accountAsset.getAssetId()));
+                        unconfirmedAssetBalance.put("unconfirmedBalanceQNT", String.valueOf(accountAsset.getUnconfirmedQuantityQNT()));
+                        unconfirmedAssetBalances.add(unconfirmedAssetBalance);
+                    }
                 }
                 if (assetBalances.size() > 0) {
                     response.put("assetBalances", assetBalances);
