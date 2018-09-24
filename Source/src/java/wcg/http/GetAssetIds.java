@@ -41,10 +41,7 @@ public final class GetAssetIds extends APIServlet.APIRequestHandler {
         JSONArray assetIds = new JSONArray();
         try (DbIterator<Asset> assets = Asset.getAllAssets(firstIndex, lastIndex)) {
             while (assets.hasNext()) {
-							Asset asset = assets.next();
-							if (!Long.toUnsignedString(asset.getId()).equals("11164589766816208741")) {
-                assetIds.add(Long.toUnsignedString(asset.getId()));
-							}
+                assetIds.add(Long.toUnsignedString(assets.next().getId()));
             }
         }
         JSONObject response = new JSONObject();

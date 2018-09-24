@@ -20,8 +20,6 @@ import wcg.WcgException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import wcg.Asset;
-import static wcg.http.JSONResponses.UNKNOWN_ASSET;
 
 public final class GetAsset extends APIServlet.APIRequestHandler {
 
@@ -34,13 +32,7 @@ public final class GetAsset extends APIServlet.APIRequestHandler {
     @Override
     protected JSONStreamAware processRequest(HttpServletRequest req) throws WcgException {
         boolean includeCounts = "true".equalsIgnoreCase(req.getParameter("includeCounts"));
-				Asset asset = ParameterParser.getAsset(req);
-				
-				if (asset == null || Long.toUnsignedString(asset.getId()).equals("11164589766816208741")) {
-					return UNKNOWN_ASSET;
-				}
-				
-				return JSONData.asset(ParameterParser.getAsset(req), includeCounts);
+        return JSONData.asset(ParameterParser.getAsset(req), includeCounts);
     }
 
 }

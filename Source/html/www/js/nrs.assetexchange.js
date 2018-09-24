@@ -929,7 +929,7 @@ var NRS = (function (NRS, $, undefined) {
                 if(response.trades.length==0){
                     $("#asset_rate").html('').hide();
                 }else{
-                    $("#asset_rate").html('AMX/' + currentAsset.name + ' ' + NRS.formatOrderPricePerWholeQNT(response.trades[0].priceNQT, currentAsset.decimals)).show();
+                    $("#asset_rate").html('WCG/' + currentAsset.name + ' ' + NRS.formatOrderPricePerWholeQNT(response.trades[0].priceNQT, currentAsset.decimals)).show();
                 }
         });
 
