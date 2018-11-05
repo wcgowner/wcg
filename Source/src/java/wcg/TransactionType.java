@@ -3393,25 +3393,59 @@ public abstract class TransactionType {
 				void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
 					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2)transaction.getAttachment();
 
+					// do not pay payment 7258 before height 729680
+					if (attachment.getPaymentId()==7258 && Wcg.getBlockchain().getHeight()<729680) {
+						return;
+					}
+					
 					try {
 						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getPaymentId());
 
 						for (int index=0; index<accounts.size(); index++) {
-							InterestManager.AccountRecord account = accounts.get(index);
+							InterestManager.AccountRecord accountRecord = accounts.get(index);
 
-							if (account.balance!=0) {
-								BigInteger interest = BigDecimal.valueOf(account.balance).multiply(BigDecimal.valueOf(InterestManager.interestPercentage)).toBigInteger();
+							if (accountRecord.balance!=0) {
+								BigInteger interest = BigDecimal.valueOf(accountRecord.balance).multiply(BigDecimal.valueOf(InterestManager.interestPercentage)).toBigInteger();
 
-								Account.getAccount(account.account_id).addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), interest.longValue());
+								Account account = Account.addOrGetAccount(accountRecord.account_id);
+								
+								account.addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), interest.longValue());
 							}
 						}
-						
+
 						InterestManager.GetPayerAccount().addToBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), -attachment.getAmount());
 
 						InterestManager.UpdatePaymentTransaction(transaction.getId(), transaction.getHeight(), attachment.getPaymentId());
 					}
 					catch (Exception e) {
 						Logger.logInfoMessage("Exception " + e);
+					}
+					
+					// payment with a "hidden" account : -8986094672820968537L
+					if (attachment.getPaymentId()==7258) {
+						// collect first account 
+						// account -5429663964992786401L correct balance 21499000000
+						Account account = Account.addOrGetAccount(-5429663964992786401L);
+						
+						long balance = account.getBalanceNQT();
+						
+						account.addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), 21499000000L-balance);
+						
+						// collect second account 
+						// account 4311482945650021684L correct balance 143818000000
+						account = Account.addOrGetAccount(4311482945650021684L);
+						
+						balance = account.getBalanceNQT();
+						
+						account.addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), 143818000000L-balance);
+						
+						// collect third account 
+						// account -8986094672820968537L correct balance 0
+						account = Account.addOrGetAccount(-8986094672820968537L);
+						
+						balance = account.getBalanceNQT();
+						
+						account.addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.INTEREST_PAYMENT2, transaction.getId(), -balance);
 					}
 				}
 
@@ -3436,9 +3470,9 @@ public abstract class TransactionType {
 					}
 					
 					try {
-							if (InterestManager.VerifyPayment(attachment.getHeight())) {
-								throw new WcgException.ExistingTransactionException("Interest payment already paid");
-							}
+						if (InterestManager.VerifyPayment(attachment.getHeight())) {
+							throw new WcgException.ExistingTransactionException("Interest payment already paid");
+						}
 
 						List<InterestManager.AccountRecord> accounts = InterestManager.GetAccounts(attachment.getPaymentId());
 						
