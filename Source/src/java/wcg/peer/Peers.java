@@ -917,7 +917,7 @@ public final class Peers {
             return null;
         }
 
-        String host = inetAddress.getHostAddress();
+        String host = inetAddress.getHostName();
         if (Peers.cjdnsOnly && !host.substring(0,2).equals("fc")) {
             return null;
         }
