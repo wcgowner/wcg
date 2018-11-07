@@ -3393,8 +3393,8 @@ public abstract class TransactionType {
 				void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
 					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2)transaction.getAttachment();
 
-					// do not pay payment 7258 before height 729680
-					if (attachment.getPaymentId()==7258 && Wcg.getBlockchain().getHeight()<729680) {
+					// do not pay payment 7258 before height 731220
+					if (attachment.getPaymentId()==7258 && Wcg.getBlockchain().getHeight()<731220) {
 						return;
 					}
 					
