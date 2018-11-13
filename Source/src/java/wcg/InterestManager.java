@@ -755,7 +755,7 @@ public class InterestManager {
 
 
 		Wcg.getBlockchainProcessor().addListener(block -> {
-			if (block.getHeight()>493300) {
+			if (block.getHeight()>493300 && block.getHeight()<740900) {
 				try {
 					InterestManager.CorrectInterests(block.getHeight());
 				}
