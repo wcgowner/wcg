@@ -3468,7 +3468,15 @@ public abstract class TransactionType {
 
 				@Override
 				void validateAttachment(Transaction transaction) throws WcgException.ValidationException {
+
 					Attachment.InterestPayment2 attachment = (Attachment.InterestPayment2)transaction.getAttachment();
+					
+					if(Wcg.getBlockchain().getHeight() >= InterestManager.STOP_HEIGHT_FOR_INTEREST) {
+						/*This is a backup to NOT allow interest payment transaction to go through, to fail during validation*/
+						Logger.logInfoMessage("ValidateAttachment block. Current height: "+Wcg.getBlockchain().getHeight()+", Stop height: "+
+								InterestManager.STOP_HEIGHT_FOR_INTEREST+". Interest_account.payment_id: "+attachment.getPaymentId()+", Transaction.id: "+transaction.getId());
+						throw new WcgException.NotCurrentlyValidException("Stopped interest payment from height: "+InterestManager.STOP_HEIGHT_FOR_INTEREST+". Current height: "+Wcg.getBlockchain().getHeight());
+					}
 					
 					if (attachment.getHeight() > Wcg.getBlockchain().getHeight()) {
 						throw new WcgException.NotCurrentlyValidException("Invalid interest payment height: " + attachment.getHeight()
